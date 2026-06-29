@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Impreza - Admin Menu Width
  * Description: Allarga il menu laterale dell'amministrazione per ospitare meglio le voci più lunghe. La larghezza (da 180px a 260px) si sceglie dalla select nella scheda "MU Plugin Impreza".
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Ubiquo Agency
  */
 
@@ -76,15 +76,30 @@ function impreza_admin_menu_width_css( $width ) {
 	$width = impreza_admin_menu_width_clamp( $width );
 
 	return "@media only screen and (min-width: 961px) {"
+		// Larghezza della barra e spostamento del contenuto.
 		. "body:not(.folded) #adminmenu,"
 		. "body:not(.folded) #adminmenuback,"
 		. "body:not(.folded) #adminmenuwrap{width:{$width}px;}"
 		. "body:not(.folded) #wpcontent,"
 		. "body:not(.folded) #wpfooter{margin-left:{$width}px;}"
-		. "body:not(.folded) #adminmenu .wp-not-current-submenu .wp-submenu{left:{$width}px;}"
+		// Flyout dei sotto-menu in hover/focus: allinea al bordo destro della barra allargata.
+		// Targetizza gli stessi stati di WordPress (:hover/.opensub/focus) per vincere in specificità.
+		. "body:not(.folded) #adminmenu li.menu-top:hover .wp-submenu,"
+		. "body:not(.folded) #adminmenu li.opensub .wp-submenu,"
+		. "body:not(.folded) #adminmenu li.menu-top > a.menu-top:focus + .wp-submenu{left:{$width}px;}"
+		// Le voci correnti tengono il sotto-menu inline (non come flyout), anche in hover.
+		. "body:not(.folded) #adminmenu li.wp-has-current-submenu .wp-submenu,"
+		. "body:not(.folded) #adminmenu li.wp-has-current-submenu:hover .wp-submenu,"
+		. "body:not(.folded) #adminmenu li.wp-has-current-submenu.opensub .wp-submenu{left:auto;}"
+		// RTL.
 		. ".rtl body:not(.folded) #wpcontent,"
 		. ".rtl body:not(.folded) #wpfooter{margin-left:0;margin-right:{$width}px;}"
-		. ".rtl body:not(.folded) #adminmenu .wp-not-current-submenu .wp-submenu{left:auto;right:{$width}px;}"
+		. ".rtl body:not(.folded) #adminmenu li.menu-top:hover .wp-submenu,"
+		. ".rtl body:not(.folded) #adminmenu li.opensub .wp-submenu,"
+		. ".rtl body:not(.folded) #adminmenu li.menu-top > a.menu-top:focus + .wp-submenu{left:auto;right:{$width}px;}"
+		. ".rtl body:not(.folded) #adminmenu li.wp-has-current-submenu .wp-submenu,"
+		. ".rtl body:not(.folded) #adminmenu li.wp-has-current-submenu:hover .wp-submenu,"
+		. ".rtl body:not(.folded) #adminmenu li.wp-has-current-submenu.opensub .wp-submenu{right:auto;}"
 		. "}";
 }
 
@@ -142,6 +157,7 @@ function impreza_admin_menu_width_render_manager_control( $slug ) {
 			function buildCss( width ) {
 				var marginSide = isRtl ? 'margin-right' : 'margin-left';
 				var subSide    = isRtl ? 'right' : 'left';
+				var subReset   = isRtl ? 'right:auto;' : 'left:auto;';
 
 				return '@media only screen and (min-width: 961px){'
 					+ 'body:not(.folded) #adminmenu,'
@@ -149,7 +165,12 @@ function impreza_admin_menu_width_render_manager_control( $slug ) {
 					+ 'body:not(.folded) #adminmenuwrap{width:' + width + 'px;}'
 					+ 'body:not(.folded) #wpcontent,'
 					+ 'body:not(.folded) #wpfooter{' + marginSide + ':' + width + 'px;}'
-					+ 'body:not(.folded) #adminmenu .wp-not-current-submenu .wp-submenu{' + subSide + ':' + width + 'px;}'
+					+ 'body:not(.folded) #adminmenu li.menu-top:hover .wp-submenu,'
+					+ 'body:not(.folded) #adminmenu li.opensub .wp-submenu,'
+					+ 'body:not(.folded) #adminmenu li.menu-top > a.menu-top:focus + .wp-submenu{' + ( isRtl ? 'left:auto;' : '' ) + subSide + ':' + width + 'px;}'
+					+ 'body:not(.folded) #adminmenu li.wp-has-current-submenu .wp-submenu,'
+					+ 'body:not(.folded) #adminmenu li.wp-has-current-submenu:hover .wp-submenu,'
+					+ 'body:not(.folded) #adminmenu li.wp-has-current-submenu.opensub .wp-submenu{' + subReset + '}'
 					+ '}';
 			}
 
