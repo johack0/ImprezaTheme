@@ -29,13 +29,6 @@ Repository del tema **Impreza** con child theme, plugin correlati e MU plugin pe
 | Impreza - Display Logic Device Conditions (`managed/Impreza__display-logic-device-conditions.php`) | **1.6.1** |
 | Altri MU plugin gestiti in `mu-plugins/managed/` | 31 file (vedi pannello *Impostazioni → MU Plugin Impreza*) |
 
-## Requisiti
-
-| Requisito | Valore minimo |
-|---|---|
-| WordPress | 6.2+ |
-| PHP | 7.4+ |
-
 ## Struttura
 
 - `Impreza/` — tema base (UpSolution).
