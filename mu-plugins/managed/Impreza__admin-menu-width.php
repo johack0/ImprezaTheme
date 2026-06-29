@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Impreza - Admin Menu Width
  * Description: Allarga il menu laterale dell'amministrazione per ospitare meglio le voci più lunghe. La larghezza (da 180px a 260px) si sceglie dalla select nella scheda "MU Plugin Impreza".
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Ubiquo Agency
  */
 
@@ -135,6 +135,7 @@ function impreza_admin_menu_width_render_manager_control( $slug ) {
 		<select
 			id="impreza-admin-menu-width-select"
 			name="<?php echo esc_attr( IMPREZA_ADMIN_MENU_WIDTH_OPTION ); ?>"
+			style="width: 100%; max-width: 100%; box-sizing: border-box;"
 		>
 			<?php foreach ( impreza_admin_menu_width_choices() as $width ) : ?>
 				<option value="<?php echo (int) $width; ?>" <?php selected( $current, $width ); ?>>
