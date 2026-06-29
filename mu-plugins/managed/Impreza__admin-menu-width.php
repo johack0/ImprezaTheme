@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Admin Menu Width
+ * Plugin Name: Impreza - Admin Menu Width
  * Description: Allarga il menu laterale dell'amministrazione per ospitare meglio le voci più lunghe. Larghezza regolabile da 180px a 260px in Impostazioni → Larghezza Menu Admin.
- * Version:     1.0.0
- * Author:      Ubiquo Agency
+ * Version: 1.0.0
+ * Author: Ubiquo Agency
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

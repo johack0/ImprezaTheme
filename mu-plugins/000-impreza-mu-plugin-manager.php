@@ -20,6 +20,7 @@ function impreza_mu_plugin_manager_get_default_enabled_slugs() {
 	return array(
 		'Impreza__header-add-element-live-search.php',
 		'Impreza__display-logic-device-conditions.php',
+		'Impreza__admin-menu-width.php',
 	);
 }
 
