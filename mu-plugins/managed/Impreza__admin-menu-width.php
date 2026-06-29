@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Impreza - Admin Menu Width
- * Description: Allarga il menu laterale dell'amministrazione per ospitare meglio le voci più lunghe. Larghezza regolabile da 180px a 260px in Impostazioni → Larghezza Menu Admin.
- * Version: 1.0.0
+ * Description: Allarga il menu laterale dell'amministrazione per ospitare meglio le voci più lunghe. La larghezza (da 180px a 260px) si sceglie dalla select nella scheda "MU Plugin Impreza".
+ * Version: 1.1.0
  * Author: Ubiquo Agency
  */
 
@@ -13,8 +13,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 const IMPREZA_ADMIN_MENU_WIDTH_OPTION  = 'impreza_admin_menu_width';
 const IMPREZA_ADMIN_MENU_WIDTH_MIN     = 180;
 const IMPREZA_ADMIN_MENU_WIDTH_MAX     = 260;
-const IMPREZA_ADMIN_MENU_WIDTH_STEP    = 5;
+const IMPREZA_ADMIN_MENU_WIDTH_STEP    = 10;
 const IMPREZA_ADMIN_MENU_WIDTH_DEFAULT = 200;
+const IMPREZA_ADMIN_MENU_WIDTH_SLUG    = 'Impreza__admin-menu-width.php';
+
+/**
+ * Restituisce le larghezze selezionabili (da MIN a MAX a passi di STEP).
+ *
+ * @return int[]
+ */
+function impreza_admin_menu_width_choices() {
+	$choices = array();
+
+	for ( $width = IMPREZA_ADMIN_MENU_WIDTH_MIN; $width <= IMPREZA_ADMIN_MENU_WIDTH_MAX; $width += IMPREZA_ADMIN_MENU_WIDTH_STEP ) {
+		$choices[] = $width;
+	}
+
+	return $choices;
+}
 
 /**
  * Restituisce la larghezza salvata, normalizzata tra MIN e MAX.
@@ -86,145 +102,82 @@ function impreza_admin_menu_width_print_styles() {
 add_action( 'admin_head', 'impreza_admin_menu_width_print_styles' );
 
 /**
- * Gestisce il salvataggio del form prima del render, poi reindirizza.
+ * Mostra la select della larghezza nella riga del plugin, dentro la scheda "MU Plugin Impreza".
+ *
+ * @param string $slug Filename del plugin in fase di render.
  */
-function impreza_admin_menu_width_handle_save() {
-	if ( empty( $_POST['impreza_admin_menu_width_save'] ) ) {
+function impreza_admin_menu_width_render_manager_control( $slug ) {
+	if ( $slug !== IMPREZA_ADMIN_MENU_WIDTH_SLUG ) {
 		return;
 	}
 
-	check_admin_referer( 'impreza_admin_menu_width_save' );
-
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'Sorry, you are not allowed to access this page.' ) );
-	}
-
-	$width = isset( $_POST['impreza_admin_menu_width'] )
-		? impreza_admin_menu_width_clamp( wp_unslash( $_POST['impreza_admin_menu_width'] ) )
-		: IMPREZA_ADMIN_MENU_WIDTH_DEFAULT;
-
-	update_option( IMPREZA_ADMIN_MENU_WIDTH_OPTION, $width, false );
-
-	wp_safe_redirect(
-		add_query_arg(
-			array(
-				'page'                            => 'impreza-admin-menu-width',
-				'impreza_admin_menu_width_saved'  => '1',
-			),
-			admin_url( 'options-general.php' )
-		)
-	);
-	exit;
-}
-add_action( 'admin_init', 'impreza_admin_menu_width_handle_save' );
-
-/**
- * Registra la pagina impostazioni.
- */
-function impreza_admin_menu_width_admin_menu() {
-	add_options_page(
-		'Larghezza Menu Admin',
-		'Larghezza Menu Admin',
-		'manage_options',
-		'impreza-admin-menu-width',
-		'impreza_admin_menu_width_render_page'
-	);
-}
-add_action( 'admin_menu', 'impreza_admin_menu_width_admin_menu' );
-
-/**
- * Render della pagina impostazioni con slider e anteprima live.
- */
-function impreza_admin_menu_width_render_page() {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'Sorry, you are not allowed to access this page.' ) );
-	}
-
-	$width = impreza_admin_menu_width_get();
+	$current = impreza_admin_menu_width_get();
 	?>
-	<div class="wrap">
-		<h1>Larghezza Menu Admin</h1>
+	<p style="margin: 10px 0 0;">
+		<label for="impreza-admin-menu-width-select" style="display:block; margin-bottom:4px; font-weight:600;">
+			Larghezza menu
+		</label>
+		<select
+			id="impreza-admin-menu-width-select"
+			name="<?php echo esc_attr( IMPREZA_ADMIN_MENU_WIDTH_OPTION ); ?>"
+		>
+			<?php foreach ( impreza_admin_menu_width_choices() as $width ) : ?>
+				<option value="<?php echo (int) $width; ?>" <?php selected( $current, $width ); ?>>
+					<?php echo (int) $width; ?>px<?php echo IMPREZA_ADMIN_MENU_WIDTH_DEFAULT === $width ? ' (default)' : ''; ?>
+				</option>
+			<?php endforeach; ?>
+		</select>
+	</p>
+	<style id="impreza-admin-menu-width-live"></style>
+	<script>
+		(function () {
+			var select = document.getElementById('impreza-admin-menu-width-select');
+			var live   = document.getElementById('impreza-admin-menu-width-live');
+			var isRtl  = document.documentElement.dir === 'rtl' || ( document.body && document.body.classList.contains('rtl') );
 
-		<p class="description">
-			Imposta la larghezza del menu laterale dell'amministrazione per dare più spazio alle voci più lunghe.
-			Valori consentiti: da <?php echo (int) IMPREZA_ADMIN_MENU_WIDTH_MIN; ?>px a <?php echo (int) IMPREZA_ADMIN_MENU_WIDTH_MAX; ?>px.
-			L'anteprima è immediata; ricordati di salvare per rendere la modifica permanente.
-		</p>
+			if ( ! select || ! live ) {
+				return;
+			}
 
-		<?php if ( ! empty( $_GET['impreza_admin_menu_width_saved'] ) ) : ?>
-			<div class="notice notice-success is-dismissible">
-				<p>Larghezza del menu salvata.</p>
-			</div>
-		<?php endif; ?>
+			function buildCss( width ) {
+				var marginSide = isRtl ? 'margin-right' : 'margin-left';
+				var subSide    = isRtl ? 'right' : 'left';
 
-		<form method="post">
-			<?php wp_nonce_field( 'impreza_admin_menu_width_save' ); ?>
-			<input type="hidden" name="impreza_admin_menu_width_save" value="1">
+				return '@media only screen and (min-width: 961px){'
+					+ 'body:not(.folded) #adminmenu,'
+					+ 'body:not(.folded) #adminmenuback,'
+					+ 'body:not(.folded) #adminmenuwrap{width:' + width + 'px;}'
+					+ 'body:not(.folded) #wpcontent,'
+					+ 'body:not(.folded) #wpfooter{' + marginSide + ':' + width + 'px;}'
+					+ 'body:not(.folded) #adminmenu .wp-not-current-submenu .wp-submenu{' + subSide + ':' + width + 'px;}'
+					+ '}';
+			}
 
-			<table class="form-table" role="presentation">
-				<tr>
-					<th scope="row">
-						<label for="impreza-admin-menu-width-range">Larghezza menu</label>
-					</th>
-					<td>
-						<input
-							type="range"
-							id="impreza-admin-menu-width-range"
-							name="impreza_admin_menu_width"
-							min="<?php echo (int) IMPREZA_ADMIN_MENU_WIDTH_MIN; ?>"
-							max="<?php echo (int) IMPREZA_ADMIN_MENU_WIDTH_MAX; ?>"
-							step="<?php echo (int) IMPREZA_ADMIN_MENU_WIDTH_STEP; ?>"
-							value="<?php echo (int) $width; ?>"
-							style="width: 320px; max-width: 100%; vertical-align: middle;"
-						>
-						<output id="impreza-admin-menu-width-output" style="display:inline-block; min-width: 56px; margin-left: 10px; font-weight: 600;">
-							<?php echo (int) $width; ?>px
-						</output>
-					</td>
-				</tr>
-			</table>
+			function apply() {
+				var width = parseInt( select.value, 10 ) || <?php echo (int) IMPREZA_ADMIN_MENU_WIDTH_DEFAULT; ?>;
+				live.textContent = buildCss( width );
+			}
 
-			<?php submit_button( 'Salva larghezza' ); ?>
-		</form>
-
-		<style id="impreza-admin-menu-width-live"></style>
-
-		<script>
-			(function () {
-				var range  = document.getElementById('impreza-admin-menu-width-range');
-				var output = document.getElementById('impreza-admin-menu-width-output');
-				var live   = document.getElementById('impreza-admin-menu-width-live');
-				var isRtl  = document.documentElement.dir === 'rtl' || document.body.classList.contains('rtl');
-
-				if (!range || !output || !live) {
-					return;
-				}
-
-				function buildCss(width) {
-					var marginSide = isRtl ? 'margin-right' : 'margin-left';
-					var subSide    = isRtl ? 'right' : 'left';
-
-					return '@media only screen and (min-width: 961px){'
-						+ 'body:not(.folded) #adminmenu,'
-						+ 'body:not(.folded) #adminmenuback,'
-						+ 'body:not(.folded) #adminmenuwrap{width:' + width + 'px;}'
-						+ 'body:not(.folded) #wpcontent,'
-						+ 'body:not(.folded) #wpfooter{' + marginSide + ':' + width + 'px;}'
-						+ 'body:not(.folded) #adminmenu .wp-not-current-submenu .wp-submenu{' + subSide + ':' + width + 'px;}'
-						+ '}';
-				}
-
-				function apply() {
-					var width = parseInt(range.value, 10) || <?php echo (int) IMPREZA_ADMIN_MENU_WIDTH_DEFAULT; ?>;
-					output.textContent = width + 'px';
-					live.textContent = buildCss(width);
-				}
-
-				range.addEventListener('input', apply);
-				range.addEventListener('change', apply);
-				apply();
-			}());
-		</script>
-	</div>
+			select.addEventListener( 'change', apply );
+			apply();
+		}());
+	</script>
 	<?php
 }
+add_action( 'impreza_mu_plugin_manager_render_row_controls', 'impreza_admin_menu_width_render_manager_control', 10, 2 );
+
+/**
+ * Salva la larghezza selezionata quando si salva la scheda "MU Plugin Impreza".
+ *
+ * Il nonce e i permessi sono già stati verificati dal manager prima di questo hook.
+ */
+function impreza_admin_menu_width_save_from_manager() {
+	if ( ! isset( $_POST[ IMPREZA_ADMIN_MENU_WIDTH_OPTION ] ) ) {
+		return;
+	}
+
+	$width = impreza_admin_menu_width_clamp( wp_unslash( $_POST[ IMPREZA_ADMIN_MENU_WIDTH_OPTION ] ) );
+
+	update_option( IMPREZA_ADMIN_MENU_WIDTH_OPTION, $width, false );
+}
+add_action( 'impreza_mu_plugin_manager_save', 'impreza_admin_menu_width_save_from_manager' );

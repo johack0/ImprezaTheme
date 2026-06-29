@@ -155,6 +155,12 @@ function impreza_mu_plugin_manager_handle_save_request() {
 	update_option( IMPREZA_MU_PLUGIN_MANAGER_OPTION, $enabled, false );
 	update_option( IMPREZA_MU_PLUGIN_MANAGER_DISABLED_OPTION, array_values( array_diff( array_keys( $plugins ), $enabled ) ), false );
 
+	/**
+	 * Permette ai MU plugin gestiti di salvare impostazioni proprie inviate
+	 * dallo stesso form. Nonce e permessi sono già stati verificati sopra.
+	 */
+	do_action( 'impreza_mu_plugin_manager_save' );
+
 	wp_safe_redirect(
 		add_query_arg(
 			array(
@@ -327,6 +333,16 @@ function impreza_mu_plugin_manager_render_page() {
 									</span>
 								</span>
 							</label>
+							<?php
+							/**
+							 * Permette ai MU plugin gestiti di aggiungere controlli propri
+							 * (es. una select di impostazioni) nella loro riga del manager.
+							 *
+							 * @param string $slug   Filename del plugin.
+							 * @param array  $plugin Dati del plugin (name, description, version, ...).
+							 */
+							do_action( 'impreza_mu_plugin_manager_render_row_controls', $slug, $plugin );
+							?>
 						</div>
 					<?php endforeach; ?>
 				</div>
