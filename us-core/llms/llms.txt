@@ -1,0 +1,17 @@
+# UpSolution Impreza & Zephyr — LLMs Documentation
+
+> Structured documentation for AI agents working with the UpSolution Impreza/Zephyr WordPress themes (powered by the `us-core` plugin).
+>
+> Source plugin: us-core 9.0. Source repository: upsolution/wp.
+
+## Scope
+
+**Content generation only** — composing and editing `post_content` from existing UpSolution shortcodes and pre-built section templates. The agent does not modify PHP/CSS files, register new shortcodes, or change theme options.
+
+## Primary entry point
+
+- [Content agent entry point](content/llms-content.txt): Generates `post_content` from UpSolution shortcodes and ready-to-use section templates. Covers composition rules, the 75 in-scope shortcodes (index at `content/shortcodes.md`, one file per shortcode under `content/shortcodes/`), common parameter groups (Effects / Display Logic / Design), dynamic-value tokens and link enums, and the snapshot of pre-built section templates from the UpSolution library.
+
+## Maintenance reference
+
+- [Authoring conventions](README.md): Internal — how records in this set are structured (entry schemas, source-link notation, versioning). Used for regeneration/maintenance, not by the agent at runtime.

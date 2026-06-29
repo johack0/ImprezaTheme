@@ -1,0 +1,800 @@
+<?php defined( 'ABSPATH' ) OR die( 'This script cannot be accessed directly.' );
+
+/**
+ * Common Design options
+ */
+
+$misc = us_config( 'elements_misc' );
+
+// Generate options for "Hide on states"
+$responsive_states_options = array();
+foreach ( us_get_responsive_states() as $state => $data ) {
+	$responsive_states_options[ $state ] = $data['title'];
+}
+
+$is_fullwidth_field = us_get_option( 'full_width_direction_fields' );
+
+return array(
+
+	// Design settings based on CSS properties
+	'css' => array(
+		'type' => 'design_options',
+		'group' => __( 'Design', 'us' ),
+		'usb_check_param_for_data_indicator' => TRUE,
+
+		// DEV: property keys for css MUST be written with a hyphen. Example: font-size and not font_size
+		'params' => array(
+
+			// Text
+			'color' => array(
+				'title' => us_translate( 'Color' ),
+				'type' => 'color',
+				'clear_pos' => 'right',
+				'with_gradient' => FALSE,
+				'std' => '',
+				'cols' => 2,
+				'group' => us_translate( 'Text' ),
+			),
+			// Note: When using responsive design, the default value will be `inherit`
+			// for the possibility of canceling other values.
+			'text-align' => array(
+				'title' => us_translate( 'Alignment' ),
+				'type' => 'radio',
+				'labels_as_icons' => 'fas fa-align-*',
+				'options' => array(
+					'inherit' => us_translate( 'Default' ),
+					'left' => us_translate( 'Left' ),
+					'center' => us_translate( 'Center' ),
+					'right' => us_translate( 'Right' ),
+					'justify' => us_translate( 'Justify' ),
+				),
+				'std' => 'inherit',
+				'cols' => 2,
+				'group' => us_translate( 'Text' ),
+			),
+			'font-size' => array(
+				'title' => __( 'Font Size', 'us' ),
+				'description' => $misc['desc_font_size'],
+				'type' => 'text',
+				'std' => '',
+				'group' => us_translate( 'Text' ),
+			),
+			'line-height' => array(
+				'title' => __( 'Line height', 'us' ),
+				'description' => $misc['desc_line_height'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => us_translate( 'Text' ),
+			),
+			'letter-spacing' => array(
+				'title' => __( 'Letter Spacing', 'us' ),
+				'description' => $misc['desc_letter_spacing'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => us_translate( 'Text' ),
+			),
+			'font-family' => array(
+				'title' => __( 'Font', 'us' ),
+				'type' => 'select',
+				'options' => us_get_fonts_for_selection(),
+				'std' => '',
+				'group' => us_translate( 'Text' )
+			),
+			'font-weight' => array(
+				'title' => __( 'Font Weight', 'us' ),
+				'description' => $misc['desc_font_weight'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => us_translate( 'Text' ),
+			),
+			'text-transform' => array(
+				'title' => __( 'Text Transform', 'us' ),
+				'type' => 'select',
+				'options' => array(
+					'' => '– ' . us_translate( 'Default' ) . ' –',
+					'none' => us_translate( 'None' ),
+					'uppercase' => 'UPPERCASE',
+					'lowercase' => 'lowercase',
+					'capitalize' => 'Capitalize',
+				),
+				'std' => '',
+				'cols' => 2,
+				'group' => us_translate( 'Text' ),
+			),
+			'text-wrap' => array(
+				'title' => __( 'Text Wrap', 'us' ),
+				'type' => 'select',
+				'options' => array(
+					'' => '– ' . us_translate( 'Default' ) . ' –',
+					'balance' => 'Balance',
+				),
+				'std' => '',
+				'cols' => 2,
+				'group' => us_translate( 'Text' ),
+			),
+			'font-style' => array(
+				'title' => __( 'Font Style', 'us' ),
+				'type' => 'select',
+				'options' => array(
+					'' => '– ' . us_translate( 'Default' ) . ' –',
+					'normal' => __( 'normal', 'us' ),
+					'italic' => __( 'italic', 'us' ),
+				),
+				'std' => '',
+				'cols' => 2,
+				'group' => us_translate( 'Text' ),
+			),
+
+			// Background
+			'background-color' => array(
+				'title' => __( 'Background Сolor', 'us' ),
+				'type' => 'color',
+				'clear_pos' => 'right',
+				'std' => '',
+				'group' => us_translate_x( 'Background', 'custom background' ),
+			),
+			'background-image' => array(
+				'title' => __( 'Background Image', 'us' ),
+				'type' => 'upload',
+				'std' => '',
+				'group' => us_translate_x( 'Background', 'custom background' ),
+				'dynamic_values' => TRUE,
+			),
+			'background-position' => array(
+				'title' => __( 'Background Position', 'us' ),
+				'description' => $misc['desc_bg_pos'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => us_translate_x( 'Background', 'custom background' ),
+				'show_if' => array( 'background-image', '!=', '' ),
+			),
+			'background-size' => array(
+				'title' => __( 'Background Size', 'us' ),
+				'type' => 'text',
+				'description' => $misc['desc_bg_size'],
+				'std' => 'auto',
+				'cols' => 2,
+				'group' => us_translate_x( 'Background', 'custom background' ),
+				'show_if' => array( 'background-image', '!=', '' ),
+			),
+			'background-blend-mode' => array(
+				'title' => __( 'Background Blend Mode', 'us' ),
+				'description' => '<a href="https://web.dev/learn/css/blend-modes#separable_blend_modes" target="_blank">' . __( 'Learn more', 'us' ). '</a>',
+				'type' => 'select',
+				'options' => array(
+					'normal' => us_translate( 'None' ),
+					'multiply' => 'Multiply',
+					'screen' => 'Screen',
+					'overlay' => 'Overlay',
+					'darken' => 'Darken',
+					'lighten' => 'Lighten',
+					'color-dodge' => 'Color dodge',
+					'color-burn' => 'Color burn',
+					'hard-light' => 'Hard light',
+					'soft-light' => 'Soft light',
+					'difference' => 'Difference',
+					'exclusion' => 'Exclusion',
+					'hue' => 'Hue',
+					'saturation' => 'Saturation',
+					'color' => 'Color',
+					'luminosity' => 'Luminosity',
+				),
+				'std' => 'normal',
+				'group' => us_translate_x( 'Background', 'custom background' ),
+				'show_if' => array( 'background-image', '!=', '' ),
+			),
+			'background-repeat' => array(
+				'title' => __( 'Background Repeat', 'us' ),
+				'type' => 'select',
+				'options' => array(
+					'repeat' => __( 'Repeat', 'us' ),
+					'repeat-x' => __( 'Horizontally', 'us' ),
+					'repeat-y' => __( 'Vertically', 'us' ),
+					'no-repeat' => us_translate( 'None' ),
+				),
+				'std' => 'repeat',
+				'cols' => 2,
+				'group' => us_translate_x( 'Background', 'custom background' ),
+				'show_if' => array( 'background-image', '!=', '' ),
+			),
+			'background-attachment' => array(
+				'title' => __( 'Background Attachment', 'us' ),
+				'type' => 'radio',
+				'options' => array(
+					'scroll' => 'scroll',
+					'fixed' => 'fixed',
+				),
+				'std' => 'scroll',
+				'cols' => 2,
+				'group' => us_translate_x( 'Background', 'custom background' ),
+				'show_if' => array( 'background-image', '!=', '' ),
+			),
+			'backdrop-filter' => array(
+				'title' => __( 'Backdrop Filter', 'us' ),
+				'description' => __( 'Examples:', 'us' ) . ' <span class="usof-example">blur(10px)</span>, <span class="usof-example">grayscale(100%)</span>, <span class="usof-example">invert(75%)</span>',
+				'type' => 'text',
+				'std' => '',
+				'group' => us_translate_x( 'Background', 'custom background' ),
+			),
+
+			// Sizes
+			'width' => array(
+				'title' => us_translate( 'Width' ),
+				'description' => $misc['desc_width'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Sizes', 'us' ),
+			),
+			'height' => array(
+				'title' => us_translate( 'Height' ),
+				'description' => $misc['desc_height'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Sizes', 'us' ),
+			),
+			'max-width' => array(
+				'title' => us_translate( 'Max Width' ),
+				'description' => $misc['desc_width'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Sizes', 'us' ),
+			),
+			'max-height' => array(
+				'title' => us_translate( 'Max Height' ),
+				'description' => $misc['desc_height'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Sizes', 'us' ),
+			),
+			'min-width' => array(
+				'title' => __( 'Min Width', 'us' ),
+				'description' => $misc['desc_width'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Sizes', 'us' ),
+			),
+			'min-height' => array(
+				'title' => __( 'Min Height', 'us' ),
+				'description' => $misc['desc_height'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Sizes', 'us' ),
+			),
+			'aspect-ratio' => array(
+				'title' => __( 'Aspect Ratio', 'us' ),
+				'description' => $misc['desc_aspect_ratio'],
+				'type' => 'text',
+				'std' => '',
+				'group' => __( 'Sizes', 'us' ),
+			),
+
+			// Spacing
+			'margin-left' => array(
+				'title' => $is_fullwidth_field ? '' : 'Margin',
+				'description' => us_translate( 'Left' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Spacing', 'us' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-4' : '',
+			) + ( ! $is_fullwidth_field ? array( 'html-data' => array( 'relations' => array( 'margin-top', 'margin-right', 'margin-bottom' ) ) ) : array() ),
+			'margin-top' => array(
+				'title' => $is_fullwidth_field ? 'Margin' : '&nbsp;',
+				'description' => us_translate( 'Top' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Spacing', 'us' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-1' : '',
+			) + ( $is_fullwidth_field ? array( 'html-data' => array( 'relations' => array( 'margin-left', 'margin-right', 'margin-bottom' ) ) ) : array() ),
+			'margin-bottom' => array(
+				'title' => $is_fullwidth_field ? '' : '&nbsp;',
+				'description' => us_translate( 'Bottom' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Spacing', 'us' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-3' : '',
+			),
+			'margin-right' => array(
+				'title' => $is_fullwidth_field ? '' : '&nbsp;',
+				'description' => us_translate( 'Right' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Spacing', 'us' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-2' : '',
+			),
+			'padding-left' => array(
+				'title' => $is_fullwidth_field ? '' : 'Padding',
+				'description' => us_translate( 'Left' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Spacing', 'us' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-8' : '',
+			) + ( ! $is_fullwidth_field ? array( 'html-data' => array( 'relations' => array( 'padding-top', 'padding-right', 'padding-bottom' ) ) ) : array() ),
+			'padding-top' => array(
+				'title' => $is_fullwidth_field ? 'Padding' : '&nbsp;',
+				'description' => us_translate( 'Top' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Spacing', 'us' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-5' : '',
+			) + ( $is_fullwidth_field ? array( 'html-data' => array( 'relations' => array( 'padding-left', 'padding-right', 'padding-bottom' ) ) ) : array() ),
+			'padding-bottom' => array(
+				'title' => $is_fullwidth_field ? '' : '&nbsp;',
+				'description' => us_translate( 'Bottom' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Spacing', 'us' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-7' : '',
+			),
+			'padding-right' => array(
+				'title' => $is_fullwidth_field ? '' : '&nbsp;',
+				'description' => us_translate( 'Right' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Spacing', 'us' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-6' : '',
+			),
+
+			// Border
+			'border-radius' => array(
+				'title' => __( 'Border Radius', 'us' ),
+				'description' => $misc['desc_border_radius'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => us_translate( 'Border' ),
+			),
+			'border-style' => array(
+				'title' => __( 'Border Style', 'us' ),
+				'type' => 'select',
+				'options' => array(
+					'none' => us_translate( 'None' ),
+					'solid' => __( 'Solid', 'us' ),
+					'dashed' => __( 'Dashed', 'us' ),
+					'dotted' => __( 'Dotted', 'us' ),
+					'double' => __( 'Double', 'us' ),
+				),
+				'std' => 'none',
+				'cols' => 2,
+				'group' => us_translate( 'Border' ),
+			),
+			'border-left-width' => array(
+				'title' => $is_fullwidth_field ? '' : __( 'Border Width', 'us' ),
+				'description' => us_translate( 'Left' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => us_translate( 'Border' ),
+				'show_if' => array( 'border-style', '!=', 'none' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-4' : '',
+			) + ( ! $is_fullwidth_field ? array( 'html-data' => array( 'relations' => array( 'border-top-width', 'border-right-width', 'border-bottom-width' ) ) ) : array() ),
+			'border-top-width' => array(
+				'title' => $is_fullwidth_field ? __( 'Border Width', 'us' ) : '&nbsp;',
+				'description' => us_translate( 'Top' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => us_translate( 'Border' ),
+				'show_if' => array( 'border-style', '!=', 'none' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-1' : '',
+			) + ( $is_fullwidth_field ? array( 'html-data' => array( 'relations' => array( 'border-left-width', 'border-right-width', 'border-bottom-width' ) ) ) : array() ),
+			'border-bottom-width' => array(
+				'title' => $is_fullwidth_field ? '' : '&nbsp;',
+				'description' => us_translate( 'Bottom' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => us_translate( 'Border' ),
+				'show_if' => array( 'border-style', '!=', 'none' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-3' : '',
+			),
+			'border-right-width' => array(
+				'title' => $is_fullwidth_field ? '' : '&nbsp;',
+				'description' => us_translate( 'Right' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => us_translate( 'Border' ),
+				'show_if' => array( 'border-style', '!=', 'none' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-2' : '',
+			),
+			'border-color' => array(
+				'title' => __( 'Border Сolor', 'us' ),
+				'type' => 'color',
+				'clear_pos' => 'right',
+				'with_gradient' => FALSE,
+				'std' => '',
+				'group' => us_translate( 'Border' ),
+				'show_if' => array( 'border-style', '!=', 'none' ),
+			),
+
+			// Position
+			'position' => array(
+				'type' => 'select',
+				'options' => array(
+					'' => '– ' . us_translate( 'Default' ) . ' –',
+					'static' => 'Static',
+					'relative' => 'Relative',
+					'absolute' => 'Absolute',
+					'fixed' => 'Fixed',
+					'sticky' => 'Sticky',
+				),
+				'std' => '',
+				'group' => __( 'Position', 'us' ),
+			),
+			'left' => array(
+				'title' => $is_fullwidth_field ? '' : __( 'Position', 'us' ),
+				'description' => us_translate( 'Left' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Position', 'us' ),
+				'show_if' => array( 'position', '!=', 'static' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-4' : '',
+			) + ( ! $is_fullwidth_field ? array( 'html-data' => array( 'relations' => array( 'top', 'right', 'bottom' ) ) ) : array() ),
+			'top' => array(
+				'title' => $is_fullwidth_field ? __( 'Position', 'us' ) : '&nbsp;',
+				'description' => us_translate( 'Top' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Position', 'us' ),
+				'show_if' => array( 'position', '!=', 'static' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-1' : '',
+			) + ( $is_fullwidth_field ? array( 'html-data' => array( 'relations' => array( 'left', 'right', 'bottom' ) ) ) : array() ),
+			'bottom' => array(
+				'title' => $is_fullwidth_field ? '' : '&nbsp;',
+				'description' => us_translate( 'Bottom' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Position', 'us' ),
+				'show_if' => array( 'position', '!=', 'static' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-3' : '',
+			),
+			'right' => array(
+				'title' => $is_fullwidth_field ? '' : '&nbsp;',
+				'description' => us_translate( 'Right' ),
+				'type' => 'text',
+				'std' => '',
+				'cols' => $is_fullwidth_field ? 1 : 4,
+				'group' => __( 'Position', 'us' ),
+				'show_if' => array( 'position', '!=', 'static' ),
+				'classes' => $is_fullwidth_field ? 'fullwidth-direction-field order-2' : '',
+			),
+			'z-index' => array(
+				'title' => 'z-index',
+				'description' => $misc['desc_z_index'],
+				'type' => 'text',
+				'std' => '',
+				'group' => __( 'Position', 'us' ),
+				'show_if' => array( 'position', '!=', 'static' ),
+			),
+
+			// Text Shadow
+			'text-shadow-h-offset' => array(
+				'title' => __( 'Horizontal Shift', 'us' ),
+				'description' => $misc['desc_shadow'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Text Shadow', 'us' ),
+			),
+			'text-shadow-v-offset' => array(
+				'title' => __( 'Vertical Shift', 'us' ),
+				'description' => $misc['desc_shadow'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Text Shadow', 'us' ),
+			),
+			'text-shadow-blur' => array(
+				'title' => __( 'Blur', 'us' ),
+				'description' => $misc['desc_shadow'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Text Shadow', 'us' ),
+			),
+			'text-shadow-color' => array(
+				'title' => us_translate( 'Color' ),
+				'type' => 'color',
+				'clear_pos' => 'right',
+				'with_gradient' => FALSE,
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Text Shadow', 'us' ),
+			),
+
+			// Box Shadow
+			'box-shadow-h-offset' => array(
+				'title' => __( 'Horizontal Shift', 'us' ),
+				'description' => $misc['desc_shadow'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Box Shadow', 'us' ),
+			),
+			'box-shadow-v-offset' => array(
+				'title' => __( 'Vertical Shift', 'us' ),
+				'description' => $misc['desc_shadow'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Box Shadow', 'us' ),
+			),
+			'box-shadow-blur' => array(
+				'title' => __( 'Blur', 'us' ),
+				'description' => $misc['desc_shadow'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Box Shadow', 'us' ),
+			),
+			'box-shadow-spread' => array(
+				'title' => __( 'Spread', 'us' ),
+				'description' => $misc['desc_shadow'],
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'group' => __( 'Box Shadow', 'us' ),
+			),
+			'box-shadow-color' => array(
+				'title' => us_translate( 'Color' ),
+				'type' => 'color',
+				'clear_pos' => 'right',
+				'with_gradient' => FALSE,
+				'std' => '',
+				'group' => __( 'Box Shadow', 'us' ),
+			),
+
+			// Overflow
+			'overflow' => array(
+				'type' => 'select',
+				'options' => array(
+					'' => '– ' . us_translate( 'Default' ) . ' –',
+					'hidden' => 'Hidden',
+					'visible' => 'Visible',
+					'auto' => 'Auto',
+				),
+				'std' => '',
+				'group' => 'Overflow',
+			),
+			'clip-path' => array(
+				'title' => 'Clip-path',
+				'description' => __( 'Examples:', 'us' ) . sprintf(
+					'<br><span class="usof-example">%s</span><br><span class="usof-example">%s</span><br><span class="usof-example">%s</span>',
+					'ellipse(75% 100% at bottom)',
+					'polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%)',
+					'polygon(100% 50%, 75% 93.3%, 25% 93.3%, 0% 50%, 25% 6.7%, 75% 6.7%)'
+				),
+				'type' => 'text',
+				'std' => '',
+				'group' => 'Overflow',
+			),
+
+			// Transformation
+			'transform' => array(
+				'title' => 'Transform',
+				'description' => __( 'Examples:', 'us' ) . sprintf(
+					' <span class="usof-example">%s</span>, <span class="usof-example">%s</span>, <span class="usof-example">%s</span>, <span class="usof-example">%s</span>, <span class="usof-example">%s</span>',
+					'translateY(-50%)',
+					'translate(100px, 50px)',
+					'scaleX(0.5)',
+					'scale(1.2)',
+					'rotate(90deg) skewX(-10deg)'
+				),
+				'type' => 'text',
+				'std' => '',
+				'group' => __( 'Transformation', 'us' ),
+			),
+			'transform-origin' => array(
+				'title' => 'Transform Origin',
+				'description' => __( 'Examples:', 'us' ) . sprintf(
+					' <span class="usof-example">%s</span>, <span class="usof-example">%s</span>, <span class="usof-example">%s</span>, <span class="usof-example">%s</span>',
+					'center right',
+					'top left',
+					'50px 50px',
+					'bottom right 60px'
+				),
+				'type' => 'text',
+				'std' => '',
+				'group' => __( 'Transformation', 'us' ),
+			),
+
+			// Animation
+			'animation-name' => array(
+				'description' => __( 'Will be applied to this element, when it enters into the browsers viewport.', 'us' ),
+				'type' => 'select',
+				'options' => array(
+					'none' => us_translate( 'None' ),
+					'fade' => __( 'Fade', 'us' ),
+					'afc' => __( 'Appear From Center', 'us' ),
+					'afl' => __( 'Appear From Left', 'us' ),
+					'afr' => __( 'Appear From Right', 'us' ),
+					'afb' => __( 'Appear From Bottom', 'us' ),
+					'aft' => __( 'Appear From Top', 'us' ),
+					'hfc' => __( 'Height Stretch', 'us' ),
+					'wfc' => __( 'Width Stretch', 'us' ),
+					'bounce' => __( 'Bounce', 'us' ),
+				),
+				'std' => 'none',
+				'group' => __( 'Animation', 'us' ),
+			),
+			'animation-delay' => array(
+				'title' => __( 'Animation Delay', 'us' ),
+				'description' => __( 'Examples:', 'us' ) . ' <span class="usof-example">250ms</span>, <span class="usof-example">0.5s</span>, <span class="usof-example">1s</span>, <span class="usof-example">1.5s</span>',
+				'type' => 'text',
+				'std' => '',
+				'show_if' => array( 'animation-name', '!=', '' ),
+				'group' => __( 'Animation', 'us' ),
+			),
+		),
+
+		// The value will be compiled into css and added to the style tag
+		'usb_preview' => array(
+			'design_options' => array(
+				// List of specific classes that will be added if there is a value by key name
+				'color' => 'has_text_color',
+				'font-size' => 'has_font_size',
+				'background-color' => 'has_bg_color',
+				'width' => 'has_width',
+				'height' => 'has_height',
+				'aspect-ratio' => 'has_aspect_ratio',
+				'border-radius' => 'has_border_radius',
+			),
+			// ...
+		),
+	),
+
+	// Extra CSS class
+	'el_class' => array(
+		'title' => __( 'Extra class', 'us' ),
+		'type' => 'text',
+		'std' => '',
+		'shortcode_cols' => 2,
+		'header_cols' => 2,
+		'group' => __( 'Design', 'us' ),
+		'usb_check_param_for_data_indicator' => TRUE,
+		'usb_preview' => array(
+			'attr' => 'class',
+		),
+	),
+
+	// Element ID
+	'el_id' => array(
+		'title' => __( 'Element ID', 'us' ),
+		'type' => 'text',
+		'std' => '',
+		'cols' => 2,
+		'group' => __( 'Design', 'us' ),
+		'usb_check_param_for_data_indicator' => TRUE,
+		'context' => array( 'shortcode', 'header' ), // can't be added to Grid Layout
+		'usb_preview' => array(
+			'attr' => 'id',
+		),
+	),
+	
+	// Custom HTML attributes
+	'enable_custom_html_atts' => array(
+		'type' => 'switch',
+		'switch_text' => __( 'Custom HTML attributes', 'us' ),
+		'description' => __( 'Will be added to the main HTML container of this element.', 'us' ),
+		'std' => 0,
+		'classes' => 'desc_2',
+		'group' => __( 'Design', 'us' ),
+		'usb_check_param_for_data_indicator' => TRUE,
+	),
+	'custom_html_atts' => array(
+		'type' => 'group',
+		'show_controls' => TRUE,
+		'is_sortable' => FALSE,
+		'is_accordion' => FALSE,
+		'params' => array(
+			'name' => array(
+				'title' => us_translate( 'Name' ),
+				'placeholder' => 'data-my-param',
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'admin_label' => TRUE,
+			),
+			'value' => array(
+				'title' => us_translate( 'Value' ),
+				'placeholder' => '123',
+				'type' => 'text',
+				'std' => '',
+				'cols' => 2,
+				'admin_label' => TRUE,
+			),
+		),
+		'show_if' => array( 'enable_custom_html_atts', '=', '1' ),
+		'group' => __( 'Design', 'us' ),
+		'usb_check_param_for_data_indicator' => TRUE,
+	),
+
+	// Hide element on responsive states
+	'hide_on_states' => array(
+		'title' => __( 'Hide on', 'us' ),
+		'type' => 'checkboxes',
+		'options' => $responsive_states_options,
+		'std' => '',
+		'classes' => 'vertical',
+		'group' => __( 'Design', 'us' ),
+		'usb_check_param_for_data_indicator' => TRUE,
+		'context' => array( 'shortcode' ),
+		'usb_preview' => array(
+			'mod' => 'hide_on',
+		),
+	),
+
+	// Additional options for Header elements
+	'hide_for_sticky' => array(
+		'type' => 'switch',
+		'switch_text' => __( 'Hide this element when the header is sticky', 'us' ),
+		'std' => 0,
+		'group' => __( 'Design', 'us' ),
+		'usb_check_param_for_data_indicator' => TRUE,
+		'context' => array( 'header' ),
+	),
+	'hide_for_not_sticky' => array(
+		'type' => 'switch',
+		'switch_text' => __( 'Hide this element when the header is NOT sticky', 'us' ),
+		'std' => 0,
+		'group' => __( 'Design', 'us' ),
+		'usb_check_param_for_data_indicator' => TRUE,
+		'context' => array( 'header' ),
+	),
+
+	// Additional options for Grid Layout elements
+	'hide_below' => array(
+		'title' => __( 'Hide on screens LESS than', 'us' ),
+		'type' => 'slider',
+		'std' => '0px',
+		'options' => array(
+			'px' => array(
+				'min' => 0,
+				'max' => 2000,
+				'step' => 10,
+			),
+		),
+		'cols' => 2,
+		'group' => __( 'Design', 'us' ),
+		'usb_check_param_for_data_indicator' => TRUE,
+		'context' => array( 'grid' ),
+	),
+	'hide_above' => array(
+		'title' => __( 'Hide on screens MORE than', 'us' ),
+		'type' => 'slider',
+		'std' => '0px',
+		'options' => array(
+			'px' => array(
+				'min' => 0,
+				'max' => 2000,
+				'step' => 10,
+			),
+		),
+		'cols' => 2,
+		'group' => __( 'Design', 'us' ),
+		'usb_check_param_for_data_indicator' => TRUE,
+		'context' => array( 'grid' ),
+	),
+
+);

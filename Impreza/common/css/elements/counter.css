@@ -1,0 +1,90 @@
+/*
+ * Counter
+ */
+
+.w-counter-value {
+	line-height: 1em;
+	position: relative;
+	}
+.w-counter:not(.has_font_size) .w-counter-value {
+	font-size: 5rem; /* default value */
+	}
+	.w-counter-title {
+		padding: 0;
+		margin-top: .6rem;
+		}
+
+/* Slide animation */
+.w-counter-value-digit {
+	display: inline-flex;
+	position: relative;
+	overflow: hidden;
+	}
+	.w-counter-value-digit > span {
+		display: inline-block;
+		visibility: hidden;
+		}
+	.w-counter-digits {
+		width: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		overflow: hidden;
+		transform: translateZ(1px);
+		}
+		.w-counter-digits ul {
+			display: block;
+			width: 100%;
+			margin: 0;
+			padding: 0;
+			position: relative;
+			list-style: none;
+			transition: transform var(--w-counter-duration, 2s) cubic-bezier(.3,.7,.4,1);
+			}
+			.w-counter-digits ul > li {
+				margin: 0;
+				-webkit-user-select: none;
+				user-select: none;
+				}
+			.w-counter-digits ul > li.pre-active {
+				visibility: hidden;
+				}
+			.w-counter-digits ul > li.pre-active + li {
+				-webkit-user-select: auto;
+				user-select: auto;
+				}
+
+/* reset some values to not inherit from Design Options */
+p.w-counter-title,
+div.w-counter-title,
+span.w-counter-title {
+	font-size: 1rem;
+	font-weight: normal;
+	line-height: 1.4;
+	}
+
+/* Colors
+   ========================================================================== */
+.w-counter.color_heading .w-counter-value {
+	color: var(--color-content-heading);
+	}
+.w-counter.color_primary .w-counter-value {
+	color: var(--color-content-primary);
+	}
+.w-counter.color_secondary .w-counter-value {
+	color: var(--color-content-secondary);
+	}
+.l-section.color_primary .w-counter.color_heading .w-counter-value,
+.l-section.color_secondary .w-counter.color_heading .w-counter-value,
+.l-section.has_text_color .w-counter.color_heading .w-counter-value {
+	color: inherit;
+	}
+.color_alternate .w-counter.color_heading .w-counter-value {
+	color: var(--color-alt-content-heading);
+	}
+.color_alternate .w-counter.color_primary .w-counter-value {
+	color: var(--color-alt-content-primary);
+	}
+.color_alternate .w-counter.color_secondary .w-counter-value {
+	color: var(--color-alt-content-secondary);
+	}

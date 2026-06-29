@@ -1,0 +1,34 @@
+@keyframes rotate45 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(90deg);
+  }
+}
+
+.ht--preloader img {
+  transform-origin: center center;
+  animation: rotate45 300ms ease-in-out forwards;
+}
+.ht--preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  z-index: 11111;
+  overflow: hidden;
+  transition: opacity 0.3s cubic-bezier(0.6, 0.3, 0.3, 0.6);
+  background: #232526 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ht--done {
+  opacity: 0;
+}
+.ht--hidden {
+  display: none;
+}

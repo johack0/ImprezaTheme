@@ -1,0 +1,21 @@
+{
+    "name": "upsolution/us-core",
+    "description": "UpSolution Core — adds features for the Impreza and Zephyr themes.",
+    "type": "wordpress-plugin",
+    "license": "proprietary",
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "automattic/jetpack-autoloader": "^5.0",
+        "wordpress/mcp-adapter": "^0.5"
+    },
+    "config": {
+        "allow-plugins": {
+            "automattic/jetpack-autoloader": true,
+            "composer/installers": true
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

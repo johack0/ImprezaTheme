@@ -1,0 +1,12 @@
+@media screen and (max-width: 1024px) {
+  .vc_col-sm-5.wpb_column.vc_column_container,
+  .vc_col-sm-7.wpb_column.vc_column_container,
+  .vc_col-sm-10.wpb_column.vc_column_container,
+  .vc_col-sm-2.wpb_column.vc_column_container,
+  .vc_col-sm-4.wpb_column.vc_column_container,
+  .vc_col-sm-3.wpb_column.vc_column_container,
+  .vc_col-sm-1.wpb_column.vc_column_container,
+  .vc_col-sm-6.wpb_column.vc_column_container {
+    margin-bottom: 0 !important;
+  }
+}

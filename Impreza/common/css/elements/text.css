@@ -1,0 +1,74 @@
+/* 
+ * Text
+ */
+
+/* Text */
+.w-text {
+	padding: 0;
+	}
+	.w-text.has_text_color a {
+		color: inherit !important;
+		}
+	.w-text i {
+		display: inline-block;
+		vertical-align: top;
+		line-height: inherit;
+		}
+	.w-text:not(.no_text).icon_atleft i {
+		margin-inline-end: .4em;
+		}
+	.w-text:not(.no_text).icon_atright i {
+		margin-inline-start: .4em;
+		}
+	.w-text-value:empty {
+		display: none;
+		}
+
+/* Fit-to-width */
+.w-text.fit_to_width {
+	line-height: normal; /* used for correct appearance with "Use background inside text" */
+	}
+	.w-text.fit_to_width [aria-hidden] {
+		visibility: hidden;
+		}
+.w-text.fit_to_width .w-text-h {
+	display: flex;
+	container-type: inline-size;
+	--captured-length: initial;
+	--support-sentinel: var(--captured-length, 9999px);
+	letter-spacing: 0 !important;
+
+	& > :not([aria-hidden]) {
+		flex-grow: 1;
+		container-type: inline-size;
+
+		--captured-length: 100cqi;
+		--available-space: var(--captured-length);
+
+		& > * {
+			--support-sentinel: inherit;
+			--captured-length: 100cqi;
+			--ratio: tan(atan2(
+				var(--available-space),
+				var(--available-space) - var(--captured-length)
+			));
+			--font-size: clamp( 1em, 1em * var(--ratio), 9999px - var(--support-sentinel) );
+			inline-size: var(--available-space);
+
+			&:not(.w-text-h) {
+				display: block;
+				font-size: var(--font-size);
+
+				@container (inline-size > 0) {
+					white-space: nowrap;
+				}
+			}
+		}
+	}
+}
+
+@property --captured-length {
+	syntax: "<length>";
+	initial-value: 0px;
+	inherits: true;
+	}

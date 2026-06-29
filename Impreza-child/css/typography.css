@@ -1,0 +1,385 @@
+/* #################################################### */
+:root {
+  --fluid--h1: clamp(46px, 30.4px + 4vw, 88px);
+  --fluid--h2: clamp(32px, 15.0857px + 2.2857vw, 48px);
+  --fluid--h3: clamp(20px, 18.6667px + 0.3704vw, 24px);
+  --fluid--h4: clamp(18px, 15.7143px + 0.2976vw, 20px);
+  --fluid--h5: clamp(10px, 10px + 0.2vw, 18px);
+}
+/* START Typography desktop */
+.p12 *,
+.p12 {
+  font-size: 12px;
+}
+.p13 *,
+.p13 {
+  font-size: 13px;
+}
+.p14 *,
+.p14 {
+  font-size: 14px;
+}
+.p15 *,
+.p15 {
+  font-size: 15px;
+}
+.p16 *,
+.p16 {
+  font-size: 16px;
+}
+.p17 *,
+.p17 {
+  font-size: 17px;
+}
+.p18 *,
+.p18 {
+  font-size: 18px;
+}
+.p19 *,
+.p19 {
+  font-size: 19px;
+}
+.p20 *,
+.p20 {
+  font-size: 20px;
+}
+.p21 *,
+.p21 {
+  font-size: 21px;
+}
+.p22 *,
+.p22 {
+  font-size: 22px;
+}
+.p23 *,
+.p23 {
+  font-size: 23px;
+}
+.p24 *,
+.p24 {
+  font-size: 24px;
+}
+.p25 *,
+.p25 {
+  font-size: 25px;
+}
+.p26 *,
+.p26 {
+  font-size: 26px;
+}
+.p27 *,
+.p27 {
+  font-size: 27px;
+}
+.p28 *,
+.p28 {
+  font-size: 28px;
+}
+.p29 *,
+.p29 {
+  font-size: 29px;
+}
+.p30 *,
+.p30 {
+  font-size: 30px;
+}
+.p31 *,
+.p31 {
+  font-size: 31px;
+}
+.p32 *,
+.p32 {
+  font-size: 32px;
+}
+.p33 *,
+.p33 {
+  font-size: 33px;
+}
+.p34 *,
+.p34 {
+  font-size: 34px;
+}
+.p35 *,
+.p35 {
+  font-size: 35px;
+}
+.p36 *,
+.p36 {
+  font-size: 36px;
+}
+.p37 *,
+.p37 {
+  font-size: 37px;
+}
+.p38 *,
+.p38 {
+  font-size: 38px;
+}
+.p39 *,
+.p39 {
+  font-size: 39px;
+}
+.p40 *,
+.p40 {
+  font-size: 40px;
+}
+.p41 *,
+.p41 {
+  font-size: 41px;
+}
+.p42 *,
+.p42 {
+  font-size: 42px;
+}
+.p43 *,
+.p43 {
+  font-size: 43px;
+}
+.p44 *,
+.p44 {
+  font-size: 44px;
+}
+.p45 *,
+.p45 {
+  font-size: 45px;
+}
+.p46 *,
+.p46 {
+  font-size: 46px;
+}
+.p47 *,
+.p47 {
+  font-size: 47px;
+}
+.p48 *,
+.p48 {
+  font-size: 48px;
+}
+.p49 *,
+.p49 {
+  font-size: 49px;
+}
+.p50 *,
+.p50 {
+  font-size: 50px;
+}
+.p51 *,
+.p51 {
+  font-size: 51px;
+}
+.p52 *,
+.p52 {
+  font-size: 52px;
+}
+.p53 *,
+.p53 {
+  font-size: 53px;
+}
+.p54 *,
+.p54 {
+  font-size: 54px;
+}
+.p55 *,
+.p55 {
+  font-size: 55px;
+}
+.p56 *,
+.p56 {
+  font-size: 56px;
+}
+.p57 *,
+.p57 {
+  font-size: 57px;
+}
+.p58 *,
+.p58 {
+  font-size: 58px;
+}
+.p59 *,
+.p59 {
+  font-size: 59px;
+}
+.p60 *,
+.p60 {
+  font-size: 60px;
+}
+.p61 *,
+.p61 {
+  font-size: 61px;
+}
+.p62 *,
+.p62 {
+  font-size: 62px;
+}
+.p63 *,
+.p63 {
+  font-size: 63px;
+}
+.p64 *,
+.p64 {
+  font-size: 64px;
+}
+.p65 *,
+.p65 {
+  font-size: 65px;
+}
+.p66 *,
+.p66 {
+  font-size: 66px;
+}
+.p67 *,
+.p67 {
+  font-size: 67px;
+}
+.p68 *,
+.p68 {
+  font-size: 68px;
+}
+.p69 *,
+.p69 {
+  font-size: 69px;
+}
+.p70 *,
+.p70 {
+  font-size: 70px;
+}
+.p71 *,
+.p71 {
+  font-size: 71px;
+}
+.p72 *,
+.p72 {
+  font-size: 72px;
+}
+.p73 *,
+.p73 {
+  font-size: 73px;
+}
+.p74 *,
+.p74 {
+  font-size: 74px;
+}
+.p75 *,
+.p75 {
+  font-size: 75px;
+}
+.p76 *,
+.p76 {
+  font-size: 76px;
+}
+.p77 *,
+.p77 {
+  font-size: 77px;
+}
+.p78 *,
+.p78 {
+  font-size: 78px;
+}
+.p79 *,
+.p79 {
+  font-size: 79px;
+}
+.p80 *,
+.p80 {
+  font-size: 80px;
+}
+.p81 *,
+.p81 {
+  font-size: 81px;
+}
+.p82 *,
+.p82 {
+  font-size: 82px;
+}
+.p83 *,
+.p83 {
+  font-size: 83px;
+}
+.p84 *,
+.p84 {
+  font-size: 84px;
+}
+.p85 *,
+.p85 {
+  font-size: 85px;
+}
+.p86 *,
+.p86 {
+  font-size: 86px;
+}
+.p87 *,
+.p87 {
+  font-size: 87px;
+}
+.p88 *,
+.p88 {
+  font-size: 88px;
+}
+.p89 *,
+.p89 {
+  font-size: 89px;
+}
+.p90 *,
+.p90 {
+  font-size: 90px;
+}
+.p91 *,
+.p91 {
+  font-size: 91px;
+}
+.p92 *,
+.p92 {
+  font-size: 92px;
+}
+.p93 *,
+.p93 {
+  font-size: 93px;
+}
+.p94 *,
+.p94 {
+  font-size: 94px;
+}
+.p95 *,
+.p95 {
+  font-size: 95px;
+}
+.p96 *,
+.p96 {
+  font-size: 96px;
+}
+.p97 *,
+.p97 {
+  font-size: 97px;
+}
+.p98 *,
+.p98 {
+  font-size: 98px;
+}
+.p99 *,
+.p99 {
+  font-size: 99px;
+}
+.p100 *,
+.p100 {
+  font-size: 100px;
+}
+.p101 *,
+.p101 {
+  font-size: 101px;
+}
+.p102 *,
+.p102 {
+  font-size: 102px;
+}
+.p103 *,
+.p103 {
+  font-size: 103px;
+}
+.p104 *,
+.p104 {
+  font-size: 104px;
+}
+
+/* typography MOBILE */
+@media screen and (max-width: 1024px) {
+}

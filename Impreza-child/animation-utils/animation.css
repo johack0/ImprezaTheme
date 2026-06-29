@@ -1,0 +1,41 @@
+@import url("./main-animation/style.css");
+@import url("./mouse/mouse.css");
+@import url("./animation-preload/style.css");
+
+
+
+
+@keyframes bounce {
+  0% {
+    clip-path: inset(30%);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0%);
+  }
+}
+@keyframes descaled {
+  0% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.us_animate_bounce {
+  animation-name: bounce !important;
+}
+
+.ht--animation-image.start {
+  animation-duration: 2s !important;
+}
+.ht--animation-image.start img {
+  animation-name: descaled;
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+  /* animation-timing-function: linear; */
+}
+
+.us_animate_this {
+/*  width: fit-content !important;*/
+}

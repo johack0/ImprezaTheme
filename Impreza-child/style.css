@@ -1,0 +1,54 @@
+/*
+Theme Name: Impreza Child
+Template: Impreza
+Version: 1.0
+Author: UpSolution
+Theme URI: http://impreza.us-themes.com/
+Author URI: http://us-themes.com/
+*/
+
+/*Add your own styles here:*/
+/* @import url("./css/typography.css");
+@import url("./css/button.css");
+@import url("./css/mobile.css");
+@import url("./css/custom.css");
+@import url("./css/hamburgers.css");
+@import url("./css/header/header.css"); */
+/* @import url("./animation-utils/animation.css"); */
+
+/* @import url("./css/pages/home.css"); */
+/* @import url("./css/pages/lavora-con-noi.css"); */
+
+/* new file */
+
+/* start initialization */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  transform: translateZ(0) scale(1, 1);
+}
+/* start lenis */
+/* html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+} */
+/* end lenis */
+/* end initialization */

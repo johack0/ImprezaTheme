@@ -1,0 +1,34 @@
+# UpSolution — Content Agent Documentation
+
+> Entry point for AI agents that generate WordPress page content (`post_content`) using UpSolution shortcodes and pre-built section templates. Optimized for shortcode names, valid parameter values, container nesting rules, and ready-to-paste section recipes for Impreza and Zephyr themes.
+>
+> Source plugin: us-core 9.0. Audience: content generation (no PHP/CSS knowledge required).
+
+## Read in this order
+
+1. [Composition rules](composition-rules.md): Cross-cutting rules for assembling valid `post_content` — root structure, nesting graph, attribute encoding (link picker, per-element CSS via `css="…"`, responsive single-value JSON, group JSON, `icon="set|name"` picker), inline HTML allowlists per attribute, palette tokens, reusing pre-built sections, responsive overrides, and cross-shortcode anti-patterns. **Start here — and read the "HARD RULES" card at the top of the file in particular.** Before emitting any `icon="…"` attribute, read [§3.6](composition-rules.md#36-icon--icon-picker) — bundled font is FA5, FA6 names render an empty `<i>` box silently.
+2. [Shortcodes (75)](shortcodes.md): Index of the shortcodes available — containers, basic blocks, interactive blocks, lists, post-element blocks, and other building blocks. The index is a compact table of contents; per-shortcode bodies live in `content/shortcodes/<config-id>.md` (one file each). Open only the entries you need — each per-shortcode file covers purpose, when to use, when to avoid, useful parameters with valid values, minimal copy-paste examples, and common combinations.
+3. [Section templates (snapshot)](sections.md): Ready-made sections from the UpSolution library, grouped by category. The index lists each category; individual templates live in `content/sections/<category-id>.md` as self-contained shortcode blocks you can drop into `post_content` and edit. Use as starting points for full sections; tune per-template via the rules from (1).
+
+## Common parameter groups
+
+Three parameter packs are shared across most shortcodes and documented once each, instead of being repeated in every shortcode entry:
+
+- [Effects](element-effects.md): scroll-driven motion (translate, opacity, blur, scale).
+- [Display Logic](element-display-logic.md): conditional rendering (auth state, role, device, custom fields).
+- [Design](element-design.md): per-element CSS, extra classes/ID, custom HTML attributes, visibility breakpoints.
+
+## Cross-cutting reference
+
+- [Dynamic Values](element-dynamic-values.md): the two subsystems that let one shortcode produce a different result per post / user / site — `{{…}}` text tokens (resolved by `us_replace_dynamic_value()`) and the per-param link enums stored in `type=link` JSON. Includes the complete token reference and the auto-generated (shortcode, parameter) matrix.
+
+## Glossary
+
+- **Palette token** — a `_slug` color value from the site palette (e.g. `_content_primary`, `_content_link`). Valid anywhere a color is accepted: inside `css="…"` JSON, color-type shortcode attributes, color-type meta keys, Theme Options colors. The slugs of the current install come from `upsolution-get-palette`. Prefer a palette token over literal HEX so content follows the site palette.
+- **Dynamic value** — umbrella for two distinct subsystems (see [Dynamic Values](element-dynamic-values.md)): `{{…}}` **text tokens** substituted inside text / textarea / image-id attributes (e.g. `{{post.title}}`), and **link enums** — `{"type":"post"}`-style URL-encoded JSON in `link`-family attributes. "Dynamic" in these docs always means one of those two; palette tokens are NOT dynamic values.
+- **config-id** — the per-shortcode doc id under `shortcodes/<config-id>`: `us_*` tags drop the prefix (`us_btn` → `shortcodes/btn`), `vc_*` tags keep it (`vc_row` → `shortcodes/vc_row`).
+- **Section category id** — two-letter id under `sections/<id>`; the decode table is in [Section templates](sections.md).
+
+## Maintenance reference
+
+- [Authoring conventions](../README.md): How records in this set are structured. Used for regeneration/maintenance, not required at content-generation time.
