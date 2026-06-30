@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Impreza - Librerie JS
  * Description: Carica GSAP, Lenis e MouseFollower per il child theme e aggiunge una pagina (Impostazioni &rarr; Librerie JS Impreza) per attivarle o disattivarle singolarmente, inclusi i singoli plugin GSAP. Separato dal MU Plugin Manager.
- * Version: 1.1.0
+ * Version: 1.1.1
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -230,9 +230,8 @@ function impreza_js_libraries_render_page() {
 
 	$libraries      = impreza_js_libraries_definitions();
 	$enabled        = impreza_js_libraries_enabled_keys();
-	$gsap_plugins   = impreza_js_libraries_gsap_plugin_definitions();
+	$gsap_plugins    = impreza_js_libraries_gsap_plugin_definitions();
 	$enabled_plugins = impreza_js_libraries_gsap_enabled_plugins();
-	$gsap_on        = in_array( 'gsap', $enabled, true );
 	?>
 	<div class="wrap">
 		<h1>Librerie JS Impreza</h1>
@@ -282,7 +281,6 @@ function impreza_js_libraries_render_page() {
 													class="impreza-js-libraries-gsap-plugin"
 													value="<?php echo esc_attr( $pkey ); ?>"
 													<?php checked( in_array( $pkey, $enabled_plugins, true ) ); ?>
-													<?php disabled( ! $gsap_on ); ?>
 												>
 												<?php echo esc_html( $plugin['label'] ); ?>
 											</label>
@@ -307,9 +305,11 @@ function impreza_js_libraries_render_page() {
 				if (!core || !plugins.length) {
 					return;
 				}
+				// NB: non disabilitiamo le checkbox (i campi disabled non verrebbero
+				// inviati nel POST e la selezione dei plugin andrebbe persa al salvataggio).
+				// Le ingrigiamo soltanto come promemoria: i plugin richiedono GSAP core attivo.
 				function sync() {
 					plugins.forEach(function (cb) {
-						cb.disabled = !core.checked;
 						cb.closest('label').style.opacity = core.checked ? '' : '0.5';
 					});
 				}
