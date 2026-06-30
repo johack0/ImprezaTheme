@@ -53,10 +53,15 @@ document.addEventListener("DOMContentLoaded", async function (event) {
 
   // --- INIZIALIZZAZIONE CURSORE (MouseFollower) ---
   // Caricato dinamicamente solo se l'interruttore è attivo (MU plugin "Impreza - Librerie JS").
-  if (libs.mousefollower) {
+  // MouseFollower richiede GSAP: lo inizializziamo solo se window.gsap è disponibile,
+  // per evitare l'errore "this.gsap is undefined".
+  if (libs.mousefollower && typeof window.gsap !== "undefined") {
     const { default: MouseFollower } = await import(
       "./minified/MouseFollower.min.js"
     );
+
+    // Collega esplicitamente GSAP a MouseFollower (più robusto del fallback a window.gsap).
+    MouseFollower.registerGSAP(window.gsap);
 
     // Metodo 2: cursore personalizzato definito in mouse.js
     // (l'import istanzia anche il cursore configurato lì, come in precedenza).

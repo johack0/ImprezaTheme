@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Impreza - Librerie JS
  * Description: Carica GSAP, Lenis e MouseFollower per il child theme e aggiunge una pagina (Impostazioni &rarr; Librerie JS Impreza) per attivarle o disattivarle singolarmente, inclusi i singoli plugin GSAP. Separato dal MU Plugin Manager.
- * Version: 1.2.0
+ * Version: 1.2.1
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -111,6 +111,30 @@ function impreza_js_libraries_gsap_plugin_is_enabled( $key ) {
 }
 
 /**
+ * Avvolge uno script UMD con due script inline che, durante la sua esecuzione,
+ * nascondono define/module/exports.
+ *
+ * Sul sito un altro script definisce temporaneamente questi global: l'UMD di
+ * GSAP/Lenis verrebbe così dirottato sul ramo CommonJS/AMD e NON creerebbe il
+ * global atteso (window.gsap / window.Lenis). Neutralizzandoli solo attorno al
+ * file, l'UMD prende il ramo globale corretto. Lo stack supporta l'annidamento.
+ *
+ * @param string $handle Handle dello script già accodato.
+ */
+function impreza_js_libraries_guard_umd_global( $handle ) {
+	wp_add_inline_script(
+		$handle,
+		'window.__impUMD=window.__impUMD||[];window.__impUMD.push([window.define,window.module,window.exports]);window.define=window.module=window.exports=undefined;',
+		'before'
+	);
+	wp_add_inline_script(
+		$handle,
+		'(function(){var s=(window.__impUMD||[]).pop()||[];window.define=s[0];window.module=s[1];window.exports=s[2];})();',
+		'after'
+	);
+}
+
+/**
  * Accoda le librerie attive (script classici che espongono i global usati dal child).
  */
 function impreza_js_libraries_enqueue() {
@@ -121,6 +145,7 @@ function impreza_js_libraries_enqueue() {
 		$core = $dir . 'gsap.min.js';
 		if ( file_exists( $core ) ) {
 			wp_enqueue_script( 'gsap-js', $dir_uri . 'gsap.min.js', array(), filemtime( $core ), true );
+			impreza_js_libraries_guard_umd_global( 'gsap-js' );
 
 			foreach ( impreza_js_libraries_gsap_plugin_definitions() as $suffix => $plugin ) {
 				if ( ! impreza_js_libraries_gsap_plugin_is_enabled( $suffix ) ) {
@@ -129,6 +154,7 @@ function impreza_js_libraries_enqueue() {
 				$path = $dir . $plugin['file'];
 				if ( file_exists( $path ) ) {
 					wp_enqueue_script( "gsap-js-{$suffix}", $dir_uri . $plugin['file'], array( 'gsap-js' ), filemtime( $path ), true );
+					impreza_js_libraries_guard_umd_global( "gsap-js-{$suffix}" );
 				}
 			}
 		}
@@ -138,6 +164,7 @@ function impreza_js_libraries_enqueue() {
 		$lenis = $dir . 'lenis.min.js';
 		if ( file_exists( $lenis ) ) {
 			wp_enqueue_script( 'lenis-js', $dir_uri . 'lenis.min.js', array(), filemtime( $lenis ), true );
+			impreza_js_libraries_guard_umd_global( 'lenis-js' );
 		}
 	}
 
