@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Impreza - Librerie JS
  * Description: Carica GSAP, Lenis e MouseFollower per il child theme e aggiunge una pagina (Impostazioni &rarr; Librerie JS Impreza) per attivarle o disattivarle singolarmente, inclusi i singoli plugin GSAP. Separato dal MU Plugin Manager.
- * Version: 1.1.1
+ * Version: 1.2.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -155,13 +155,31 @@ add_action( 'wp_enqueue_scripts', 'impreza_js_libraries_enqueue', 5 );
  * presenti, quindi qui basta lo stato delle tre librerie principali.
  */
 function impreza_js_libraries_print_flags() {
+	$gsap_on = impreza_js_libraries_is_enabled( 'gsap' );
+
 	$flags = array(
-		'gsap'          => impreza_js_libraries_is_enabled( 'gsap' ),
+		'gsap'          => $gsap_on,
 		'lenis'         => impreza_js_libraries_is_enabled( 'lenis' ),
 		'mousefollower' => impreza_js_libraries_is_enabled( 'mousefollower' ),
 	);
 
-	echo '<script id="impreza-js-libraries-flags">window.ImprezaJSLibs = ' . wp_json_encode( $flags ) . ";</script>\n";
+	// Tabella leggibile per la console: stato (attivo/disattivato) di ogni componente.
+	// I plugin GSAP risultano attivi solo se anche GSAP core lo è.
+	$status = array(
+		'GSAP core'     => $gsap_on ? 'ATTIVO' : 'DISATTIVATO',
+		'Lenis'         => $flags['lenis'] ? 'ATTIVO' : 'DISATTIVATO',
+		'MouseFollower' => $flags['mousefollower'] ? 'ATTIVO' : 'DISATTIVATO',
+	);
+	foreach ( impreza_js_libraries_gsap_plugin_definitions() as $pkey => $plugin ) {
+		$plugin_on             = $gsap_on && impreza_js_libraries_gsap_plugin_is_enabled( $pkey );
+		$status[ $plugin['label'] ] = $plugin_on ? 'ATTIVO' : 'DISATTIVATO';
+	}
+
+	echo '<script id="impreza-js-libraries-flags">'
+		. 'window.ImprezaJSLibs = ' . wp_json_encode( $flags ) . ';'
+		. 'console.log("%c Librerie JS Impreza ","background:#2271b1;color:#fff;font-weight:bold;padding:2px 4px;border-radius:3px");'
+		. 'console.table(' . wp_json_encode( $status ) . ');'
+		. "</script>\n";
 }
 add_action( 'wp_head', 'impreza_js_libraries_print_flags', 1 );
 
