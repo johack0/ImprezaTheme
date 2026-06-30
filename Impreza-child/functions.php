@@ -49,18 +49,11 @@ function theme_scripts_and_styles()
 
   // === CSS ===
 
-  // Un array per gestire i CSS più facilmente
+  // Un array per gestire i CSS più facilmente.
+  // NB: i CSS sotto /css/ sono caricati ricorsivamente dal MU plugin
+  // "Impreza - Auto Load CSS". Qui resta solo ciò che è fuori da /css/.
   $css_files = [
-    "animation" => "/animation-utils/animation.css", // <-- ECCO IL FILE AGGIUNTO
-    "typography" => "/css/typography.css",
-    "button" => "/css/button.css",
-    "mobile" => "/css/mobile.css",
-    "custom" => "/css/custom.css",
-    "hamburgers" => "/css/hamburgers.css",
-    "lavora" => "/css/pages/lavora-con-noi.css",
-    "home" => "/css/pages/home.css",
-    "owl" => "/css/components/owl.css",
-    "header" => "/css/header/header.css",
+    "animation" => "/animation-utils/animation.css",
   ];
 
   foreach ($css_files as $handle => $path) {
