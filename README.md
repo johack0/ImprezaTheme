@@ -10,9 +10,9 @@ Repository del tema **Impreza** con child theme, plugin correlati e MU plugin pe
 
 | Componente | Versione |
 |---|---|
-| Impreza (tema) | **9.0** |
+| Impreza (tema) | **9.0.1** |
 | Impreza Child | **1.0** |
-| UpSolution Core (`us-core`) | **9.0** |
+| UpSolution Core (`us-core`) | **9.0.1** |
 
 ### Plugin correlati
 
