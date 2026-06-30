@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Impreza - Librerie JS
  * Description: Carica GSAP, Lenis e MouseFollower per il child theme e aggiunge una pagina (Impostazioni &rarr; Librerie JS Impreza) per attivarle o disattivarle singolarmente, inclusi i singoli plugin GSAP. Separato dal MU Plugin Manager.
- * Version: 1.2.1
+ * Version: 1.3.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -141,20 +141,29 @@ function impreza_js_libraries_enqueue() {
 	$dir     = trailingslashit( get_stylesheet_directory() ) . 'minified/';
 	$dir_uri = trailingslashit( get_stylesheet_directory_uri() ) . 'minified/';
 
-	if ( impreza_js_libraries_is_enabled( 'gsap' ) ) {
+	// GSAP core va caricato sia quando l'interruttore GSAP è attivo, sia quando lo è
+	// MouseFollower: quest'ultimo dipende da GSAP (usa gsap.quickSetter/ticker/to).
+	// Così attivando MouseFollower la libreria necessaria si carica da sola.
+	$gsap_core_needed = impreza_js_libraries_is_enabled( 'gsap' ) || impreza_js_libraries_is_enabled( 'mousefollower' );
+
+	if ( $gsap_core_needed ) {
 		$core = $dir . 'gsap.min.js';
 		if ( file_exists( $core ) ) {
 			wp_enqueue_script( 'gsap-js', $dir_uri . 'gsap.min.js', array(), filemtime( $core ), true );
 			impreza_js_libraries_guard_umd_global( 'gsap-js' );
 
-			foreach ( impreza_js_libraries_gsap_plugin_definitions() as $suffix => $plugin ) {
-				if ( ! impreza_js_libraries_gsap_plugin_is_enabled( $suffix ) ) {
-					continue;
-				}
-				$path = $dir . $plugin['file'];
-				if ( file_exists( $path ) ) {
-					wp_enqueue_script( "gsap-js-{$suffix}", $dir_uri . $plugin['file'], array( 'gsap-js' ), filemtime( $path ), true );
-					impreza_js_libraries_guard_umd_global( "gsap-js-{$suffix}" );
+			// I plugin GSAP sono una funzionalità del solo interruttore GSAP
+			// (MouseFollower non li richiede), quindi restano legati al flag 'gsap'.
+			if ( impreza_js_libraries_is_enabled( 'gsap' ) ) {
+				foreach ( impreza_js_libraries_gsap_plugin_definitions() as $suffix => $plugin ) {
+					if ( ! impreza_js_libraries_gsap_plugin_is_enabled( $suffix ) ) {
+						continue;
+					}
+					$path = $dir . $plugin['file'];
+					if ( file_exists( $path ) ) {
+						wp_enqueue_script( "gsap-js-{$suffix}", $dir_uri . $plugin['file'], array( 'gsap-js' ), filemtime( $path ), true );
+						impreza_js_libraries_guard_umd_global( "gsap-js-{$suffix}" );
+					}
 				}
 			}
 		}
@@ -191,9 +200,11 @@ function impreza_js_libraries_print_flags() {
 	);
 
 	// Tabella leggibile per la console: stato (attivo/disattivato) di ogni componente.
-	// I plugin GSAP risultano attivi solo se anche GSAP core lo è.
-	$status = array(
-		'GSAP core'     => $gsap_on ? 'ATTIVO' : 'DISATTIVATO',
+	// GSAP core risulta caricato anche se attivato solo come dipendenza di MouseFollower.
+	// I plugin GSAP risultano attivi solo se l'interruttore GSAP è attivo.
+	$gsap_core_loaded = $gsap_on || $flags['mousefollower'];
+	$status           = array(
+		'GSAP core'     => $gsap_core_loaded ? 'ATTIVO' : 'DISATTIVATO',
 		'Lenis'         => $flags['lenis'] ? 'ATTIVO' : 'DISATTIVATO',
 		'MouseFollower' => $flags['mousefollower'] ? 'ATTIVO' : 'DISATTIVATO',
 	);
