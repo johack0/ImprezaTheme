@@ -70,6 +70,17 @@ File auto-caricato da WordPress, indipendente dal manager. Responsabilità:
 
 Con tutte on il comportamento è identico ad oggi.
 
+## Aggiornamento v1.1.0 — interruttori per singolo plugin GSAP
+
+- Nuova opzione `impreza_js_libraries_gsap_plugins` (sottoinsieme di
+  `scroll, smooth, observer, text, split, draw, motion`; `false` = tutti attivi).
+- L'enqueue di GSAP accoda solo i plugin attivi; i checkbox dei plugin sono annidati
+  sotto GSAP core e disabilitati via JS quando il core è spento.
+- `main.js`: la `gsap.registerPlugin(...)` è ora dinamica — registra i plugin
+  effettivamente presenti come global (`window.ScrollTrigger`, ecc.), saltando i non
+  caricati. Conseguenza: con tutti i plugin attivi vengono registrati tutti e 7 (prima
+  il codice ne registrava solo 3 pur caricandoli tutti). Global verificati uno per uno.
+
 ## Note / fuori scope
 
 - La doppia istanza di MouseFollower (mouse.js import + main.js:41) è preservata tal

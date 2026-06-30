@@ -1,13 +1,14 @@
 <?php
 /**
  * Plugin Name: Impreza - Librerie JS
- * Description: Carica GSAP, Lenis e MouseFollower per il child theme e aggiunge una pagina (Impostazioni &rarr; Librerie JS Impreza) per attivarle o disattivarle singolarmente. Separato dal MU Plugin Manager.
- * Version: 1.0.0
+ * Description: Carica GSAP, Lenis e MouseFollower per il child theme e aggiunge una pagina (Impostazioni &rarr; Librerie JS Impreza) per attivarle o disattivarle singolarmente, inclusi i singoli plugin GSAP. Separato dal MU Plugin Manager.
+ * Version: 1.1.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
-const IMPREZA_JS_LIBRARIES_OPTION = 'impreza_js_libraries_enabled';
+const IMPREZA_JS_LIBRARIES_OPTION             = 'impreza_js_libraries_enabled';
+const IMPREZA_JS_LIBRARIES_GSAP_PLUGINS_OPTION = 'impreza_js_libraries_gsap_plugins';
 
 /**
  * Definizione delle librerie gestibili.
@@ -18,7 +19,7 @@ function impreza_js_libraries_definitions() {
 	return array(
 		'gsap'          => array(
 			'label'       => 'GSAP',
-			'description' => 'Core GSAP + plugin (ScrollTrigger, ScrollSmoother, Observer, TextPlugin, SplitText, DrawSVG, MotionPath).',
+			'description' => 'Core GSAP. I singoli plugin sono attivabili qui sotto.',
 		),
 		'lenis'         => array(
 			'label'       => 'Lenis',
@@ -32,19 +33,19 @@ function impreza_js_libraries_definitions() {
 }
 
 /**
- * Elenco dei plugin GSAP da accodare (handle suffix => filename).
+ * Definizione dei plugin GSAP (key => label + filename).
  *
- * @return array<string,string>
+ * @return array<string,array<string,string>>
  */
-function impreza_js_libraries_gsap_plugins() {
+function impreza_js_libraries_gsap_plugin_definitions() {
 	return array(
-		'scroll'   => 'ScrollTrigger.min.js',
-		'smooth'   => 'ScrollSmoother.min.js',
-		'observer' => 'Observer.min.js',
-		'text'     => 'TextPlugin.min.js',
-		'split'    => 'SplitText.min.js',
-		'draw'     => 'DrawSVGPlugin.min.js',
-		'motion'   => 'MotionPathPlugin.min.js',
+		'scroll'   => array( 'label' => 'ScrollTrigger', 'file' => 'ScrollTrigger.min.js' ),
+		'smooth'   => array( 'label' => 'ScrollSmoother', 'file' => 'ScrollSmoother.min.js' ),
+		'observer' => array( 'label' => 'Observer', 'file' => 'Observer.min.js' ),
+		'text'     => array( 'label' => 'TextPlugin', 'file' => 'TextPlugin.min.js' ),
+		'split'    => array( 'label' => 'SplitText', 'file' => 'SplitText.min.js' ),
+		'draw'     => array( 'label' => 'DrawSVGPlugin', 'file' => 'DrawSVGPlugin.min.js' ),
+		'motion'   => array( 'label' => 'MotionPathPlugin', 'file' => 'MotionPathPlugin.min.js' ),
 	);
 }
 
@@ -72,11 +73,41 @@ function impreza_js_libraries_enabled_keys() {
 }
 
 /**
+ * Restituisce le chiavi dei plugin GSAP abilitati.
+ *
+ * Default (mai salvato): tutti attivi.
+ *
+ * @return string[]
+ */
+function impreza_js_libraries_gsap_enabled_plugins() {
+	$all = array_keys( impreza_js_libraries_gsap_plugin_definitions() );
+	$opt = get_option( IMPREZA_JS_LIBRARIES_GSAP_PLUGINS_OPTION, false );
+
+	if ( false === $opt ) {
+		return $all;
+	}
+
+	if ( ! is_array( $opt ) ) {
+		return array();
+	}
+
+	return array_values( array_intersect( array_map( 'sanitize_key', $opt ), $all ) );
+}
+
+/**
  * @param string $key
  * @return bool
  */
 function impreza_js_libraries_is_enabled( $key ) {
 	return in_array( $key, impreza_js_libraries_enabled_keys(), true );
+}
+
+/**
+ * @param string $key
+ * @return bool
+ */
+function impreza_js_libraries_gsap_plugin_is_enabled( $key ) {
+	return in_array( $key, impreza_js_libraries_gsap_enabled_plugins(), true );
 }
 
 /**
@@ -91,10 +122,13 @@ function impreza_js_libraries_enqueue() {
 		if ( file_exists( $core ) ) {
 			wp_enqueue_script( 'gsap-js', $dir_uri . 'gsap.min.js', array(), filemtime( $core ), true );
 
-			foreach ( impreza_js_libraries_gsap_plugins() as $suffix => $file ) {
-				$path = $dir . $file;
+			foreach ( impreza_js_libraries_gsap_plugin_definitions() as $suffix => $plugin ) {
+				if ( ! impreza_js_libraries_gsap_plugin_is_enabled( $suffix ) ) {
+					continue;
+				}
+				$path = $dir . $plugin['file'];
 				if ( file_exists( $path ) ) {
-					wp_enqueue_script( "gsap-js-{$suffix}", $dir_uri . $file, array( 'gsap-js' ), filemtime( $path ), true );
+					wp_enqueue_script( "gsap-js-{$suffix}", $dir_uri . $plugin['file'], array( 'gsap-js' ), filemtime( $path ), true );
 				}
 			}
 		}
@@ -117,6 +151,8 @@ add_action( 'wp_enqueue_scripts', 'impreza_js_libraries_enqueue', 5 );
  *
  * Stampato in <head> come script classico: viene eseguito prima del modulo
  * main.js (che è deferred), così le guardie sui flag funzionano sempre.
+ * I plugin GSAP sono registrati dal child in base ai global effettivamente
+ * presenti, quindi qui basta lo stato delle tre librerie principali.
  */
 function impreza_js_libraries_print_flags() {
 	$flags = array(
@@ -143,20 +179,25 @@ function impreza_js_libraries_handle_save() {
 		wp_die( esc_html__( 'Sorry, you are not allowed to access this page.' ) );
 	}
 
-	$all      = array_keys( impreza_js_libraries_definitions() );
+	$all_libs = array_keys( impreza_js_libraries_definitions() );
 	$selected = isset( $_POST['impreza_js_libraries_enabled'] )
 		? (array) wp_unslash( $_POST['impreza_js_libraries_enabled'] )
 		: array();
-
-	$enabled = array_values( array_intersect( array_map( 'sanitize_key', $selected ), $all ) );
-
+	$enabled  = array_values( array_intersect( array_map( 'sanitize_key', $selected ), $all_libs ) );
 	update_option( IMPREZA_JS_LIBRARIES_OPTION, $enabled, false );
+
+	$all_plugins      = array_keys( impreza_js_libraries_gsap_plugin_definitions() );
+	$selected_plugins = isset( $_POST['impreza_js_libraries_gsap_plugins'] )
+		? (array) wp_unslash( $_POST['impreza_js_libraries_gsap_plugins'] )
+		: array();
+	$enabled_plugins  = array_values( array_intersect( array_map( 'sanitize_key', $selected_plugins ), $all_plugins ) );
+	update_option( IMPREZA_JS_LIBRARIES_GSAP_PLUGINS_OPTION, $enabled_plugins, false );
 
 	wp_safe_redirect(
 		add_query_arg(
 			array(
-				'page'                         => 'impreza-js-libraries',
-				'impreza_js_libraries_saved'   => '1',
+				'page'                       => 'impreza-js-libraries',
+				'impreza_js_libraries_saved' => '1',
 			),
 			admin_url( 'options-general.php' )
 		)
@@ -187,8 +228,11 @@ function impreza_js_libraries_render_page() {
 		wp_die( esc_html__( 'Sorry, you are not allowed to access this page.' ) );
 	}
 
-	$libraries = impreza_js_libraries_definitions();
-	$enabled   = impreza_js_libraries_enabled_keys();
+	$libraries      = impreza_js_libraries_definitions();
+	$enabled        = impreza_js_libraries_enabled_keys();
+	$gsap_plugins   = impreza_js_libraries_gsap_plugin_definitions();
+	$enabled_plugins = impreza_js_libraries_gsap_enabled_plugins();
+	$gsap_on        = in_array( 'gsap', $enabled, true );
 	?>
 	<div class="wrap">
 		<h1>Librerie JS Impreza</h1>
@@ -220,10 +264,31 @@ function impreza_js_libraries_render_page() {
 										name="impreza_js_libraries_enabled[]"
 										value="<?php echo esc_attr( $key ); ?>"
 										<?php checked( in_array( $key, $enabled, true ) ); ?>
+										<?php echo ( 'gsap' === $key ) ? 'id="impreza-js-libraries-gsap-core"' : ''; ?>
 									>
 									Attiva
 								</label>
 								<p class="description"><?php echo esc_html( $lib['description'] ); ?></p>
+
+								<?php if ( 'gsap' === $key ) : ?>
+									<fieldset id="impreza-js-libraries-gsap-plugins" style="margin-top: 10px; padding-left: 4px; border-left: 3px solid #c3c4c7;">
+										<legend class="screen-reader-text">Plugin GSAP</legend>
+										<p class="description" style="margin: 0 0 6px 8px;">Plugin GSAP (richiedono il core attivo):</p>
+										<?php foreach ( $gsap_plugins as $pkey => $plugin ) : ?>
+											<label style="display: block; margin: 2px 0 2px 8px;">
+												<input
+													type="checkbox"
+													name="impreza_js_libraries_gsap_plugins[]"
+													class="impreza-js-libraries-gsap-plugin"
+													value="<?php echo esc_attr( $pkey ); ?>"
+													<?php checked( in_array( $pkey, $enabled_plugins, true ) ); ?>
+													<?php disabled( ! $gsap_on ); ?>
+												>
+												<?php echo esc_html( $plugin['label'] ); ?>
+											</label>
+										<?php endforeach; ?>
+									</fieldset>
+								<?php endif; ?>
 							</td>
 						</tr>
 					<?php endforeach; ?>
@@ -232,6 +297,26 @@ function impreza_js_libraries_render_page() {
 
 			<?php submit_button( 'Salva impostazioni' ); ?>
 		</form>
+
+		<script>
+			(function () {
+				var core = document.getElementById('impreza-js-libraries-gsap-core');
+				var plugins = Array.prototype.slice.call(
+					document.querySelectorAll('.impreza-js-libraries-gsap-plugin')
+				);
+				if (!core || !plugins.length) {
+					return;
+				}
+				function sync() {
+					plugins.forEach(function (cb) {
+						cb.disabled = !core.checked;
+						cb.closest('label').style.opacity = core.checked ? '' : '0.5';
+					});
+				}
+				core.addEventListener('change', sync);
+				sync();
+			}());
+		</script>
 	</div>
 	<?php
 }

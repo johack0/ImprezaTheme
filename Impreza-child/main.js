@@ -33,13 +33,22 @@ document.addEventListener("DOMContentLoaded", async function (event) {
   if (libs.gsap && typeof window.gsap !== "undefined") {
     gsap.defaults({ ease: "power3.inOut" });
 
-    // Registra tutti i plugin in una sola volta
-    gsap.registerPlugin(
-      ScrollTrigger,
-      Observer,
-      TextPlugin
-      // ScrollSmoother // Scommenta se lo usi
-    );
+    // Registra i plugin GSAP effettivamente caricati (in base agli interruttori
+    // del MU plugin "Impreza - Librerie JS"). Quelli non attivi non esistono
+    // come global e vengono semplicemente saltati.
+    const gsapPlugins = [
+      window.ScrollTrigger,
+      window.ScrollSmoother,
+      window.Observer,
+      window.TextPlugin,
+      window.SplitText,
+      window.DrawSVGPlugin,
+      window.MotionPathPlugin,
+    ].filter(Boolean);
+
+    if (gsapPlugins.length) {
+      gsap.registerPlugin(...gsapPlugins);
+    }
   }
 
   // --- INIZIALIZZAZIONE CURSORE (MouseFollower) ---
