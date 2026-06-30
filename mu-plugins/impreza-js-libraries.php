@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Impreza - Librerie JS
  * Description: Carica GSAP, Lenis e MouseFollower per il child theme e aggiunge una pagina (Impostazioni &rarr; Librerie JS Impreza) per attivarle o disattivarle singolarmente, inclusi i singoli plugin GSAP. Separato dal MU Plugin Manager.
- * Version: 1.3.0
+ * Version: 1.4.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -111,6 +111,32 @@ function impreza_js_libraries_gsap_plugin_is_enabled( $key ) {
 }
 
 /**
+ * Stato "effettivo" di caricamento di ogni componente (etichetta => bool).
+ *
+ * Tiene conto delle dipendenze: GSAP core risulta attivo anche se acceso solo
+ * come dipendenza di MouseFollower; i plugin GSAP sono attivi solo se lo è
+ * l'interruttore GSAP. Usato sia dalla console sia dal riquadro nel backend.
+ *
+ * @return array<string,bool>
+ */
+function impreza_js_libraries_effective_status() {
+	$gsap_on = impreza_js_libraries_is_enabled( 'gsap' );
+	$mf_on   = impreza_js_libraries_is_enabled( 'mousefollower' );
+
+	$status = array(
+		'GSAP core'     => ( $gsap_on || $mf_on ),
+		'Lenis'         => impreza_js_libraries_is_enabled( 'lenis' ),
+		'MouseFollower' => $mf_on,
+	);
+
+	foreach ( impreza_js_libraries_gsap_plugin_definitions() as $pkey => $plugin ) {
+		$status[ $plugin['label'] ] = $gsap_on && impreza_js_libraries_gsap_plugin_is_enabled( $pkey );
+	}
+
+	return $status;
+}
+
+/**
  * Avvolge uno script UMD con due script inline che, durante la sua esecuzione,
  * nascondono define/module/exports.
  *
@@ -191,26 +217,16 @@ add_action( 'wp_enqueue_scripts', 'impreza_js_libraries_enqueue', 5 );
  * presenti, quindi qui basta lo stato delle tre librerie principali.
  */
 function impreza_js_libraries_print_flags() {
-	$gsap_on = impreza_js_libraries_is_enabled( 'gsap' );
-
 	$flags = array(
-		'gsap'          => $gsap_on,
+		'gsap'          => impreza_js_libraries_is_enabled( 'gsap' ),
 		'lenis'         => impreza_js_libraries_is_enabled( 'lenis' ),
 		'mousefollower' => impreza_js_libraries_is_enabled( 'mousefollower' ),
 	);
 
-	// Tabella leggibile per la console: stato (attivo/disattivato) di ogni componente.
-	// GSAP core risulta caricato anche se attivato solo come dipendenza di MouseFollower.
-	// I plugin GSAP risultano attivi solo se l'interruttore GSAP è attivo.
-	$gsap_core_loaded = $gsap_on || $flags['mousefollower'];
-	$status           = array(
-		'GSAP core'     => $gsap_core_loaded ? 'ATTIVO' : 'DISATTIVATO',
-		'Lenis'         => $flags['lenis'] ? 'ATTIVO' : 'DISATTIVATO',
-		'MouseFollower' => $flags['mousefollower'] ? 'ATTIVO' : 'DISATTIVATO',
-	);
-	foreach ( impreza_js_libraries_gsap_plugin_definitions() as $pkey => $plugin ) {
-		$plugin_on             = $gsap_on && impreza_js_libraries_gsap_plugin_is_enabled( $pkey );
-		$status[ $plugin['label'] ] = $plugin_on ? 'ATTIVO' : 'DISATTIVATO';
+	// Tabella leggibile per la console, dalla stessa logica del riquadro nel backend.
+	$status = array();
+	foreach ( impreza_js_libraries_effective_status() as $label => $on ) {
+		$status[ $label ] = $on ? 'ATTIVO' : 'DISATTIVATO';
 	}
 
 	echo '<script id="impreza-js-libraries-flags">'
@@ -295,6 +311,19 @@ function impreza_js_libraries_render_page() {
 		<p class="description">
 			Attiva o disattiva il caricamento delle librerie JavaScript usate dal child theme.
 			Le modifiche hanno effetto dal prossimo caricamento della pagina front-end.
+		</p>
+
+		<h2 style="margin-top: 1em;">Stato attuale</h2>
+		<div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px;">
+			<?php foreach ( impreza_js_libraries_effective_status() as $label => $on ) : ?>
+				<span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; background: <?php echo $on ? '#d6f0d6' : '#f0f0f1'; ?>; color: <?php echo $on ? '#0a6b1c' : '#646970'; ?>; border: 1px solid <?php echo $on ? '#9bd6a0' : '#dcdcde'; ?>;">
+					<span style="width: 8px; height: 8px; border-radius: 50%; background: <?php echo $on ? '#0a6b1c' : '#a7aaad'; ?>;"></span>
+					<?php echo esc_html( $label ); ?>: <?php echo $on ? 'ATTIVO' : 'DISATTIVATO'; ?>
+				</span>
+			<?php endforeach; ?>
+		</div>
+		<p class="description" style="margin-top: 4px;">
+			Riflette la configurazione salvata. GSAP core risulta ATTIVO anche quando caricato solo come dipendenza di MouseFollower. La stessa tabella viene stampata anche nella console del front-end.
 		</p>
 
 		<?php if ( ! empty( $_GET['impreza_js_libraries_saved'] ) ) : ?>
