@@ -1,47 +1,62 @@
 // --- Importazioni ---
-import cursor from "./animation-utils/mouse/mouse.js"; // Lo lasciamo importato ma non lo useremo se scegli MouseFollower
-import MouseFollower from "./minified/MouseFollower.min.js";
+// GSAP, Lenis e MouseFollower sono gestiti dal MU plugin "Impreza - Librerie JS".
+// Lo stato degli interruttori è esposto in window.ImprezaJSLibs.
+// - GSAP e Lenis: accodati come script classici (global window.gsap / window.Lenis).
+// - MouseFollower: importato dinamicamente qui sotto solo se il flag è attivo.
 import mainAnimation from "./animation-utils/main-animation/index.js";
-// Assicurati di importare anche questo file se lo usi!
 // import animationPreload from "./path/to/animationPreload.js";
 
-import "./minified/lenis.min.js";
+const libs = window.ImprezaJSLibs || {
+  gsap: true,
+  lenis: true,
+  mousefollower: true,
+};
 
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded", async function (event) {
   console.log("DOM loaded");
 
   // --- Inizializzazione Lenis (Smooth Scroll) ---
-  const isMobile = window.innerWidth < 1024;
-  const lenis = new Lenis({
-    duration: 2,
-    velocity: 0.5,
-  });
+  if (libs.lenis && typeof window.Lenis !== "undefined") {
+    const lenis = new Lenis({
+      duration: 2,
+      velocity: 0.5,
+    });
 
-  function raf(time) {
-    lenis.raf(time);
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
     requestAnimationFrame(raf);
   }
-  requestAnimationFrame(raf);
 
   // --- Impostazioni e Plugin GSAP ---
-  gsap.defaults({ ease: "power3.inOut" });
+  if (libs.gsap && typeof window.gsap !== "undefined") {
+    gsap.defaults({ ease: "power3.inOut" });
 
-  // Registra tutti i plugin in una sola volta
-  gsap.registerPlugin(
-    ScrollTrigger,
-    Observer,
-    TextPlugin
-    // ScrollSmoother // Scommenta se lo usi
-  );
+    // Registra tutti i plugin in una sola volta
+    gsap.registerPlugin(
+      ScrollTrigger,
+      Observer,
+      TextPlugin
+      // ScrollSmoother // Scommenta se lo usi
+    );
+  }
 
-  // --- INIZIALIZZAZIONE CURSORE ---
-  // SCEGLI UNO DEI DUE METODI, NON USARLI ENTRAMBI!
+  // --- INIZIALIZZAZIONE CURSORE (MouseFollower) ---
+  // Caricato dinamicamente solo se l'interruttore è attivo (MU plugin "Impreza - Librerie JS").
+  if (libs.mousefollower) {
+    const { default: MouseFollower } = await import(
+      "./minified/MouseFollower.min.js"
+    );
 
-  // Metodo 1: MouseFollower.js (consigliato se vuoi usare quella libreria)
-  const follower = new MouseFollower();
+    // Metodo 2: cursore personalizzato definito in mouse.js
+    // (l'import istanzia anche il cursore configurato lì, come in precedenza).
+    await import("./animation-utils/mouse/mouse.js");
+    // cursor.customCursorInit(); // da scommentare se si vuole usare quel metodo
 
-  // Metodo 2: Il tuo cursore personalizzato (da tenere commentato se usi MouseFollower)
-  // cursor.customCursorInit();
+    // Metodo 1: cursore base MouseFollower
+    const follower = new MouseFollower();
+  }
 
   // --- Animazioni Principali ---
   mainAnimation.mainAnimation();
@@ -49,9 +64,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
   // --- Event Listener per il Caricamento Completo della Pagina ---
   window.addEventListener("load", function (e) {
     console.log("window loaded");
-
-    // Assicurati che 'animationPreload' sia definito e importato correttamente
-    // altrimenti questa riga causerà un errore.
     // animationPreload.animationPreload();
   });
 });

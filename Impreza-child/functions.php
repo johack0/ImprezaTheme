@@ -8,41 +8,17 @@ function theme_scripts_and_styles()
 {
   // === JAVASCRIPT ===
 
-  // Carica la libreria principale GSAP
-  wp_enqueue_script(
-    "gsap-js", // Handle
-    get_stylesheet_directory_uri() . "/minified/gsap.min.js",
-    [], // Nessuna dipendenza
-    false,
-    true // Carica nel footer
-  );
+  // NB: GSAP (core + plugin) e Lenis sono accodati dal MU plugin
+  // "Impreza - Librerie JS", che ne gestisce anche l'attivazione/disattivazione.
+  // MouseFollower viene importato dinamicamente da main.js in base allo stesso flag.
 
-  // Carica i plugin di GSAP, dichiarando 'gsap-js' come dipendenza
-  $gsap_plugins = [
-    "scroll" => "ScrollTrigger.min.js",
-    "smooth" => "ScrollSmoother.min.js",
-    "observer" => "Observer.min.js",
-    "text" => "TextPlugin.min.js",
-    "split" => "SplitText.min.js",
-    "draw" => "DrawSVGPlugin.min.js",
-    "motion" => "MotionPathPlugin.min.js",
-  ];
-
-  foreach ($gsap_plugins as $key => $file) {
-    wp_enqueue_script(
-      "gsap-js-{$key}",
-      get_stylesheet_directory_uri() . "/minified/{$file}",
-      ["gsap-js"],
-      false,
-      true
-    );
-  }
-
-  // Il tuo file JavaScript personalizzato che usa GSAP
+  // Il file JavaScript personalizzato. Nessuna dipendenza dichiarata: essendo
+  // un modulo ES (type="module") viene eseguito dopo tutti gli script classici
+  // (GSAP/Lenis), quindi i global sono già disponibili senza forzarne il caricamento.
   wp_enqueue_script(
     "gsap-js-custom",
     get_stylesheet_directory_uri() . "/main.js",
-    ["gsap-js"],
+    [],
     false,
     true
   );
