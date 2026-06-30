@@ -459,7 +459,7 @@
 					if ( updatedItem && updatedItem.totals ) {
 						const subtotalData = {
 							price: updatedItem.totals.line_subtotal || '',
-							precision: updatedItem.totals.currency_minor_unit || 2,
+							precision: updatedItem.totals.currency_minor_unit ?? 2,
 							currency_code: updatedItem.totals.currency_code || '',
 							currency_symbol: updatedItem.totals.currency_symbol || '',
 							currency_prefix: updatedItem.totals.currency_prefix || '',
@@ -472,7 +472,7 @@
 					if ( data.totals ) {
 						const subtotalData = {
 							price: data.totals.total_items || '',
-							precision: data.totals.currency_minor_unit || 2,
+							precision: data.totals.currency_minor_unit ?? 2,
 							currency_code: data.totals.currency_code || '',
 							currency_symbol: data.totals.currency_symbol || '',
 							currency_prefix: data.totals.currency_prefix || '',

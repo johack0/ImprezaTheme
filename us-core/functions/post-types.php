@@ -1475,6 +1475,7 @@ if ( ! function_exists( 'us_get_used_in_locations' ) ) {
 					array(
 						'product' => us_translate( 'Products', 'woocommerce' ),
 						'shop' => us_translate( 'Shop Page', 'woocommerce' ),
+						'shop_search' => __( 'Products Search Results Page', 'us' ),
 						'order' => us_translate( 'Orders', 'woocommerce' ),
 					),
 					us_get_taxonomies( TRUE, FALSE, 'woocommerce_only' )
@@ -1487,7 +1488,7 @@ if ( ! function_exists( 'us_get_used_in_locations' ) ) {
 				$edit_link = ' (<a' . us_implode_atts( $link_atts ) . '>' . __( 'edit in Theme Options', 'us' ) . '</a>)</div>';
 
 				foreach ( $woocommerce_types as $type => $title ) {
-					if ( ! in_array( $type, array( 'product', 'shop', 'order' ) ) ) {
+					if ( ! in_array( $type, array( 'product', 'shop', 'shop_search', 'order' ) ) ) {
 						$type = 'tax_' . $type;
 					}
 

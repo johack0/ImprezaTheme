@@ -19,7 +19,11 @@ function us_include_generated_styles_for_tinymce( $mce_css ) {
 	}
 
 	if ( $fonts_file_url = us_enqueue_google_fonts( /* return url */TRUE ) ) {
-		$mce_css_array[] = $fonts_file_url;
+		/**
+		 * Replace commas to prevent TinyMCE loading fonts values as separate files,
+		 * as CSS2 URL for Variable Fonts contains commas (e.g. "wdth,wght@0,100..900")
+		 */
+		$mce_css_array[] = str_replace( ',', '%2C', $fonts_file_url );
 	}
 
 	if ( ! empty( $mce_css_array ) ) {

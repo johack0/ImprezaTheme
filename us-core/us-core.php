@@ -6,7 +6,7 @@
  * Description: Adds plenty of features for Impreza and Zephyr themes.
  * Author: UpSolution
  * Author URI: https://us-themes.com/
- * Version: 9.0
+ * Version: 9.0.1
  **/
 
 // Global variables for plugin usage

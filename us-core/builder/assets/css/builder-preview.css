@@ -670,7 +670,7 @@ body.usb_preview .w-tabs.layout_ver .w-tabs-item {
 	}
 
 /* Add offset for case when Page Template excludes Rows around Post Content */
-body.header_hor .l-header.pos_fixed ~ .l-main > [data-usbid="post_content_root_container"] > .l-section:first-of-type > .l-section-h {
+body.header_hor .l-header.pos_fixed ~ .l-main > [data-usbid="post_content_root_container"]:first-child > .l-section:first-of-type > .l-section-h {
 	padding-top: var(--header-height, 0px);
 	}
 .w-post-elm.post_content[data-usbid="post_content_root_container"] > .l-section.usb_placeholder_row {
